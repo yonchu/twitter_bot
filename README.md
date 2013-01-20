@@ -1,5 +1,5 @@
-Python twitter bot for @melty\_blood\_bot
-====================
+Twitter bot for python
+======================
 
 The python module to create twitter bot
 
