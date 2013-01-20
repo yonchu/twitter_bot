@@ -1,0 +1,81 @@
+-- getflv result --
+{'done': ['true'],
+ 'hms': ['hiroba01.nicovideo.jp'],
+ 'hmsp': ['2530'],
+ 'hmst': ['1000000006'],
+ 'hmstk': ['1357545170.piiiT5nXzgk-u6Z7zNfMT-QUHNk'],
+ 'is_premium': ['0'],
+ 'l': ['1235'],
+ 'link': ['http://www.smilevideo.jp/view/19685807/31142188'],
+ 'ms': ['http://msg.nicovideo.jp/18/api/'],
+ 'ms_sub': ['http://sub.msg.nicovideo.jp/18/api/'],
+ 'nickname': ['melty'],
+ 'rpu': ['{"count":1827577,"users":["\\u308a\\u3083\\u3080","\\u304a\\u305f\\u304f\\u4e38","\\u9280\\u7389\\u306e\\u72fc","\\u30d5\\u30e9\\u30c3\\u30b7\\u30e5\\u30d3\\u30fc\\u30c8","\\u3057\\u3089\\u305f\\u304d","Alice","\\u4e0b\\u514b\\u4e0a","\\u305d\\u3089\\u3002","\\u4eac\\u82b1","\\u4eca\\u4e95\\u6566","\\u79cb\\u971c","\\u309c\\u0434 \\u309c;","\\u30ab\\u30a6","kazu","\\u30cf\\u30eb\\u30af","\\u8cb4\\u7f85","\\u30c0\\u30b9\\u30c8","\\u6771\\u51fa","\\u308a\\u308a","\\u3042\\u305a\\u307e"],"extra":16}'],
+ 'thread_id': ['1356594194'],
+ 'time': ['1357545110151'],
+ 'url': ['http://smile-cln67.nicovideo.jp/smile?m=19685807.58136'],
+ 'user_id': ['31142188']}
+
+
+-- post_xml --
+<packet><thread thread="1356594194" version="20090904" user_id="31142188"/><thread_leaves thread="1356594194" user_id="31142188">0-99:100,1000</thread_leaves></packet>
+
+
+-- headers --
+{'Content-Length': '167', 'Content-Type': 'text/xml'}
+
+
+-- Comments XML --
+<?xml version="1.0" encoding="utf-8"?>
+<packet>
+	<thread last_res="27" resultcode="0" revision="1" server_time="1357545113" thread="1356594194" ticket="0x4e048b40"/>
+	<leaf count="3" thread="1356594194"/>
+	<leaf count="2" leaf="1" thread="1356594194"/>
+	<leaf count="2" leaf="3" thread="1356594194"/>
+	<leaf count="2" leaf="4" thread="1356594194"/>
+	<leaf count="6" leaf="7" thread="1356594194"/>
+	<leaf count="1" leaf="8" thread="1356594194"/>
+	<leaf count="2" leaf="9" thread="1356594194"/>
+	<leaf count="3" leaf="10" thread="1356594194"/>
+	<leaf count="1" leaf="11" thread="1356594194"/>
+	<leaf count="2" leaf="14" thread="1356594194"/>
+	<leaf count="1" leaf="15" thread="1356594194"/>
+	<leaf count="2" leaf="16" thread="1356594194"/>
+	<view_counter id="sm19685807" mylist="2" video="724"/>
+	<thread last_res="27" resultcode="0" revision="1" server_time="1357545113" thread="1356594194" ticket="0x4e048b40"/>
+	<chat anonymity="1" date="1356594224" mail="184" no="1" premium="1" thread="1356594194" user_id="EFgkb6L4JO7P_Dw4Xk5cVYiD0d4" vpos="160">1</chat>
+	<chat anonymity="1" date="1356599749" mail="184" no="2" premium="1" thread="1356594194" user_id="aUM3CEVz3cZF09yIvexd8JdXz9s" vpos="772">うぽつ</chat>
+	<chat anonymity="1" date="1356604142" mail="184" no="3" thread="1356594194" user_id="dY3yTS029Jl1r-EBNhvxLUTMDsE" vpos="3059">先週の紅白戦は～？</chat>
+	<chat anonymity="1" date="1356607641" leaf="3" mail="184" no="4" premium="1" thread="1356594194" user_id="0Y3VfVMq6fBgJq8-8v0fwSuyROQ" vpos="20722">琥珀エビス美味くない？</chat>
+	<chat anonymity="1" date="1356608601" leaf="9" mail="184" no="5" premium="1" thread="1356594194" user_id="0Y3VfVMq6fBgJq8-8v0fwSuyROQ" vpos="57442">今回の実況すごい面白いｗ</chat>
+	<chat anonymity="1" date="1356619289" leaf="7" mail="184" no="6" thread="1356594194" user_id="UzV2HYBL6IpTgBCxWrQn032HnWU" vpos="43508">昼間の話はどうでもいいんだよwwww</chat>
+	<chat date="1356619396" leaf="15" mail="iPhone" no="7" premium="1" thread="1356594194" user_id="7587183" vpos="95688">ハーフが1番いいと思うがどうだろうか？</chat>
+	<chat anonymity="1" date="1356623012" leaf="10" mail="184" no="8" premium="1" thread="1356594194" user_id="ag7MF8rFM3OjrVLCkN0gscNoEzU" vpos="61619">せめてお菓子のブーツくらい持ってこーぜｗ</chat>
+	<chat anonymity="1" date="1356626867" leaf="10" mail="184" no="9" thread="1356594194" user_id="Xo__UE_oBMfJOmXAFOv10kjsR94" vpos="62777">ちょっとな</chat>
+	<chat date="1356640273" leaf="7" mail="iPhone" no="10" thread="1356594194" user_id="150639" vpos="42193">この聖天くそつまんねぇ...</chat>
+	<chat anonymity="1" date="1356645393" leaf="7" mail="184" no="11" thread="1356594194" user_id="XgkdS1SIGwiTpo3oOpJ0mzgIVfI" vpos="42515">俺は戦ってて楽しいよ</chat>
+	<chat anonymity="1" date="1356666999" leaf="4" mail="184" no="12" premium="1" thread="1356594194" user_id="hpJsiJjDDUqIzsEgEFQ6gU_-DiA" vpos="24035">スパドラあんて</chat>
+	<chat anonymity="1" date="1356667055" leaf="4" mail="184" no="13" premium="1" thread="1356594194" user_id="hpJsiJjDDUqIzsEgEFQ6gU_-DiA" vpos="29864">とりす</chat>
+	<chat anonymity="1" date="1356667203" leaf="7" mail="184" no="14" premium="1" thread="1356594194" user_id="hpJsiJjDDUqIzsEgEFQ6gU_-DiA" vpos="44640">www</chat>
+	<chat anonymity="1" date="1356690187" leaf="7" mail="184" no="15" thread="1356594194" user_id="859MLGH14E7A3ZDoboQmrok2xwM" vpos="43718">なみやん爆発しろｗ</chat>
+	<chat anonymity="1" date="1356735105" leaf="9" mail="docomo 184" no="16" premium="1" thread="1356594194" user_id="mqB_MvLL60LJdC4IZOQsa4T65tc" vpos="55725">どんどんうまくなるな、このシオンの人</chat>
+	<chat anonymity="1" date="1356767754" leaf="10" mail="184" no="17" thread="1356594194" user_id="3H1RGZn-UlZoEcFFuqvjQAQSN1w" vpos="61053">最後の一言は裁判官の心証損ねましたねえ・・・</chat>
+	<chat anonymity="1" date="1356769477" leaf="16" mail="184" no="18" thread="1356594194" user_id="umtS4oftyomzuRFx6rZmEpD8U1k" vpos="96654">F</chat>
+	<chat anonymity="1" date="1356769482" leaf="16" mail="184" no="19" thread="1356594194" user_id="umtS4oftyomzuRFx6rZmEpD8U1k" vpos="97159">F相手ならFだろ</chat>
+	<chat anonymity="1" date="1356874330" leaf="1" mail="184" no="20" thread="1356594194" user_id="7ss95cGExZLaIuFERAU50WwWxWs" vpos="6293">今まで見てた動画の影響か武装シエル最強のイメージがあったけれど最近どうなの</chat>
+	<chat anonymity="1" date="1356874504" leaf="3" mail="184" no="21" thread="1356594194" user_id="7ss95cGExZLaIuFERAU50WwWxWs" vpos="23682">紅組４人もヒスコハがいるのかｗｗｗｗ</chat>
+	<chat anonymity="1" date="1356874783" leaf="8" mail="184" no="22" thread="1356594194" user_id="7ss95cGExZLaIuFERAU50WwWxWs" vpos="51550">アダーってムシキングか</chat>
+	<chat anonymity="1" date="1356875235" leaf="14" mail="184" no="23" thread="1356594194" user_id="7ss95cGExZLaIuFERAU50WwWxWs" vpos="85871">ポータルを誰が担当するか、という問題あるんじゃ</chat>
+	<chat anonymity="1" date="1356875246" leaf="14" mail="184" no="24" thread="1356594194" user_id="7ss95cGExZLaIuFERAU50WwWxWs" vpos="86959">誰、というか「どこ」だな</chat>
+	<chat anonymity="1" date="1357471969" leaf="7" mail="184" no="25" premium="1" thread="1356594194" user_id="D3zkmQPpsN4wkocxYigWgo0MPoI" vpos="43504">uo</chat>
+	<chat anonymity="1" date="1357472077" leaf="11" mail="184" no="26" premium="1" thread="1356594194" user_id="D3zkmQPpsN4wkocxYigWgo0MPoI" vpos="71638">私を倒しても第二第三のモスクワが…</chat>
+	<chat anonymity="1" date="1357490826" leaf="1" mail="184" no="27" premium="1" thread="1356594194" user_id="Qz1-ya_yyWaRcyEY1BFe_JRGlPw" vpos="6478">最近っていうか大分前にはもうバージョン変わって大分落ちてるけど</chat>
+</packet>
+
+160   : 00:01
+772   : 00:07
+3059  : 00:30
+20722 : 03:27 (180 + 27 = 207)
+57442 : 09:34
+
+vpos * 10

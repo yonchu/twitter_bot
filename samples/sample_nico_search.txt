@@ -1,0 +1,366 @@
+# 未ログイン
+{
+    "status": "fail",
+    "message": "ログインしてください"
+}
+
+# 正常
+{
+    "count": 3561,
+    "status": "ok",
+    "list": [
+        {
+            "title": "MBAACC ずらし目押し",
+            "description_short": "いや、ニッチな動画だなぁとは思いつつなんとなく。",
+            "length": "1:07",
+            "first_retrieve": "2012-12-30 23:35:12",
+            "mylist_counter": 1,
+            "view_counter": 158,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19714151",
+            "num_res": 1,
+            "id": "sm19714151"
+        },
+        {
+            "title": "[MBAACC]メルブラ対戦日記001",
+            "description_short": "2012年12月30日Wataru(Hアルク) vs Koudai(H秋葉)この動画は、日々の対戦からの癖や改善点を発見するた...",
+            "length": "12:18",
+            "first_retrieve": "2012-12-30 16:16:11",
+            "mylist_counter": 0,
+            "view_counter": 111,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19710204",
+            "num_res": 1,
+            "id": "sm19710204"
+        },
+        {
+            "title": "[MBAACC]　2012/12/30　メルブラ対戦日記001",
+            "description_short": "2012年12月30日Wataru(Hアルク) vs Koudai(H秋葉)この動画は、日々の対戦からの癖や改善点を発見するた...",
+            "length": "12:00",
+            "first_retrieve": "2012-12-30 03:37:24",
+            "mylist_counter": 0,
+            "view_counter": 86,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19707079",
+            "num_res": 1,
+            "id": "sm19707079"
+        },
+        {
+            "title": "12/12/28 ＭＢＡＡＣＣ高田馬場大会ランダム2onその４",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "7:53",
+            "first_retrieve": "2012-12-29 06:34:43",
+            "mylist_counter": 0,
+            "view_counter": 235,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19699464",
+            "num_res": 3,
+            "id": "sm19699464"
+        },
+        {
+            "title": "12/12/28 ＭＢＡＡＣＣ高田馬場大会ランダム2onその３",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "11:53",
+            "first_retrieve": "2012-12-29 06:16:27",
+            "mylist_counter": 2,
+            "view_counter": 206,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19699411",
+            "num_res": 1,
+            "id": "sm19699411"
+        },
+        {
+            "title": "12/12/28 ＭＢＡＡＣＣ高田馬場大会ランダム2onその２",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "15:03",
+            "first_retrieve": "2012-12-29 06:02:32",
+            "mylist_counter": 0,
+            "view_counter": 222,
+            "thumbnail_url": "http://tn-skr2.smilevideo.jp/smile?i=19699369",
+            "num_res": 3,
+            "id": "sm19699369"
+        },
+        {
+            "title": "12/12/28 ＭＢＡＡＣＣ高田馬場大会ランダム2onその１",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "14:55",
+            "first_retrieve": "2012-12-29 05:36:43",
+            "mylist_counter": 1,
+            "view_counter": 254,
+            "thumbnail_url": "http://tn-skr2.smilevideo.jp/smile?i=19699313",
+            "num_res": 1,
+            "id": "sm19699313"
+        },
+        {
+            "title": "12/12/07 ＭＢＡＡＣＣ高田馬場大会固定3onその５",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "11:03",
+            "first_retrieve": "2012-12-29 05:10:48",
+            "mylist_counter": 0,
+            "view_counter": 178,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19699271",
+            "num_res": 5,
+            "id": "sm19699271"
+        },
+        {
+            "title": "12/12/07 ＭＢＡＡＣＣ高田馬場大会固定3onその４",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "6:33",
+            "first_retrieve": "2012-12-29 04:54:33",
+            "mylist_counter": 0,
+            "view_counter": 122,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19699242",
+            "num_res": 2,
+            "id": "sm19699242"
+        },
+        {
+            "title": "12/12/07 ＭＢＡＡＣＣ高田馬場大会固定3onその３",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "9:25",
+            "first_retrieve": "2012-12-29 04:42:01",
+            "mylist_counter": 0,
+            "view_counter": 128,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19699206",
+            "num_res": 1,
+            "id": "sm19699206"
+        },
+        {
+            "title": "12/12/07 ＭＢＡＡＣＣ高田馬場大会固定3onその２",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "14:34",
+            "first_retrieve": "2012-12-29 04:29:05",
+            "mylist_counter": 1,
+            "view_counter": 150,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19699178",
+            "num_res": 2,
+            "id": "sm19699178"
+        },
+        {
+            "title": "12/12/07 ＭＢＡＡＣＣ高田馬場大会固定3onその１",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "11:21",
+            "first_retrieve": "2012-12-29 04:09:50",
+            "mylist_counter": 0,
+            "view_counter": 173,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19699138",
+            "num_res": 1,
+            "id": "sm19699138"
+        },
+        {
+            "title": "12/11/23 ＭＢＡＡＣＣ高田馬場大会固定2onその４",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "8:19",
+            "first_retrieve": "2012-12-29 03:42:37",
+            "mylist_counter": 1,
+            "view_counter": 173,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19699082",
+            "num_res": 1,
+            "id": "sm19699082"
+        },
+        {
+            "title": "12/11/23 ＭＢＡＡＣＣ高田馬場大会固定2onその３",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "7:33",
+            "first_retrieve": "2012-12-29 03:32:30",
+            "mylist_counter": 0,
+            "view_counter": 184,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19699040",
+            "num_res": 1,
+            "id": "sm19699040"
+        },
+        {
+            "title": "12/11/23 ＭＢＡＡＣＣ高田馬場大会固定2onその２",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "12:51",
+            "first_retrieve": "2012-12-29 03:05:44",
+            "mylist_counter": 0,
+            "view_counter": 225,
+            "thumbnail_url": "http://tn-skr2.smilevideo.jp/smile?i=19698917",
+            "num_res": 3,
+            "id": "sm19698917"
+        },
+        {
+            "title": "12/11/23 ＭＢＡＡＣＣ高田馬場大会固定2onその１",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "11:50",
+            "first_retrieve": "2012-12-29 02:48:46",
+            "mylist_counter": 0,
+            "view_counter": 276,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19698824",
+            "num_res": 6,
+            "id": "sm19698824"
+        },
+        {
+            "title": "MBAACC　紅白戦　2012/12/26　来年もｼｸﾖﾛSP(2/2)",
+            "description_short": "■紅白戦一覧：mylist/31732387　■紅白戦生放送など：co1593811日本橋アテナにて行われている紅白戦マイ...",
+            "length": "19:44",
+            "first_retrieve": "2012-12-27 16:45:50",
+            "mylist_counter": 2,
+            "view_counter": 506,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19685827",
+            "num_res": 19,
+            "id": "sm19685827"
+        },
+        {
+            "title": "MBAACC　紅白戦　2012/12/26　来年もｼｸﾖﾛSP(1/2)",
+            "description_short": "■紅白戦一覧：mylist/31732387　■紅白戦生放送など：co1593811日本橋アテナにて行われている紅白戦マイ...",
+            "length": "20:35",
+            "first_retrieve": "2012-12-27 16:43:14",
+            "mylist_counter": 1,
+            "view_counter": 566,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19685807",
+            "num_res": 24,
+            "id": "sm19685807"
+        },
+        {
+            "title": "【替え歌】 白レンちゃんなら付き合いたい 【幸せになれ】",
+            "description_short": "クリスマスは白レンちゃんと雪原で一緒に鍋つつく予定です。本家（卓球少年さん）⇒sm19480546歌とか動画...",
+            "length": "1:09",
+            "first_retrieve": "2012-12-24 16:23:47",
+            "mylist_counter": 71,
+            "view_counter": 922,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19659046",
+            "num_res": 33,
+            "id": "sm19659046"
+        },
+        {
+            "title": "あなたにもできるカンタン赤主永久コンボ",
+            "description_short": "僕にはできません。説明字幕付けたんで、興味ある方は止めつつ読んでください。誘凪6入れをせずに、単純...",
+            "length": "2:52",
+            "first_retrieve": "2012-12-21 02:19:44",
+            "mylist_counter": 13,
+            "view_counter": 1007,
+            "thumbnail_url": "http://tn-skr2.smilevideo.jp/smile?i=19629417",
+            "num_res": 3,
+            "id": "sm19629417"
+        },
+        {
+            "title": "12月15日 アテナ日本橋 MBAACC大会 決勝トーナメント一回戦",
+            "description_short": "固定3on3 勝ち抜き式",
+            "length": "31:29",
+            "first_retrieve": "2012-12-19 23:59:00",
+            "mylist_counter": 7,
+            "view_counter": 832,
+            "thumbnail_url": "http://tn-skr2.smilevideo.jp/smile?i=19618321",
+            "num_res": 19,
+            "id": "sm19618321"
+        },
+        {
+            "title": "12月15日 アテナ日本橋 MBAACC大会 決勝トーナメント三位決定戦～決勝",
+            "description_short": "固定3on3 勝ち抜き式",
+            "length": "24:54",
+            "first_retrieve": "2012-12-19 23:59:00",
+            "mylist_counter": 3,
+            "view_counter": 856,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19618670",
+            "num_res": 8,
+            "id": "sm19618670"
+        },
+        {
+            "title": "12月15日 アテナ日本橋 MBAACC大会 決勝トーナメント準決勝",
+            "description_short": "固定3on3 勝ち抜き式",
+            "length": "23:57",
+            "first_retrieve": "2012-12-19 23:59:00",
+            "mylist_counter": 7,
+            "view_counter": 668,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19618495",
+            "num_res": 3,
+            "id": "sm19618495"
+        },
+        {
+            "title": "CCボス・イクリプス",
+            "description_short": "CCにて懐古  ※本動画内容は通常プレイにおいては再現出来ません。",
+            "length": "5:22",
+            "first_retrieve": "2012-12-16 11:32:46",
+            "mylist_counter": 8,
+            "view_counter": 733,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19592208",
+            "num_res": 12,
+            "id": "sm19592208"
+        },
+        {
+            "title": "MBAACC Fワルク基礎コンボ集+α",
+            "description_short": "今更だよ(´・ω・`)映像がカクカクしてるし画質悪いね☆投稿者コメントとかレシピ要らなかった気がする",
+            "length": "6:20",
+            "first_retrieve": "2012-12-16 03:41:09",
+            "mylist_counter": 19,
+            "view_counter": 544,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19590516",
+            "num_res": 6,
+            "id": "sm19590516"
+        },
+        {
+            "title": "MBAACC　紅白戦　2012/12/12　凸凹SP(2/2)",
+            "description_short": "■紅白戦一覧：mylist/31732387　■紅白戦生放送など：co1593811日本橋アテナにて行われている紅白戦マイ...",
+            "length": "22:02",
+            "first_retrieve": "2012-12-14 00:01:29",
+            "mylist_counter": 9,
+            "view_counter": 1107,
+            "thumbnail_url": "http://tn-skr1.smilevideo.jp/smile?i=19573548",
+            "num_res": 29,
+            "id": "sm19573548"
+        },
+        {
+            "title": "MBAACC　紅白戦　2012/12/12　凸凹SP(1/2)",
+            "description_short": "■紅白戦一覧：mylist/31732387　■紅白戦生放送など：co1593811日本橋アテナにて行われている紅白戦マイ...",
+            "length": "23:49",
+            "first_retrieve": "2012-12-13 23:58:50",
+            "mylist_counter": 8,
+            "view_counter": 958,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19573523",
+            "num_res": 14,
+            "id": "sm19573523"
+        },
+        {
+            "title": "F メルティブラッド 月姫  レン   コンボ ムービー MBAACC Stickerbrush Dreams",
+            "description_short": "標準のコンボ通常のスターターのために",
+            "length": "9:10",
+            "first_retrieve": "2012-12-13 16:50:07",
+            "mylist_counter": 21,
+            "view_counter": 957,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19569690",
+            "num_res": 77,
+            "id": "sm19569690"
+        },
+        {
+            "title": "MBAACC 七夜志貴コンボムービーⅣ",
+            "description_short": "ピカッと光ってシャキッと貫通！動き出したら止まらない！mylist/6905150",
+            "length": "3:51",
+            "first_retrieve": "2012-12-13 16:34:38",
+            "mylist_counter": 15,
+            "view_counter": 1294,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19569646",
+            "num_res": 16,
+            "id": "sm19569646"
+        },
+        {
+            "title": "MBAACC　遠野志貴 クレセント＆ハーフ　実戦用コンボ集",
+            "description_short": "志貴の実戦向けコンボ集ですキャラ限のやつもありますが、詳しく調べてないです（数回撮りなおしてるの...",
+            "length": "2:16",
+            "first_retrieve": "2012-12-11 02:48:46",
+            "mylist_counter": 13,
+            "view_counter": 848,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19553690",
+            "num_res": 2,
+            "id": "sm19553690"
+        },
+        {
+            "title": "12/11/16 ＭＢＡＡＣＣ高田馬場大会固定３on　その５",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "8:23",
+            "first_retrieve": "2012-12-08 07:24:46",
+            "mylist_counter": 3,
+            "view_counter": 857,
+            "thumbnail_url": "http://tn-skr4.smilevideo.jp/smile?i=19529603",
+            "num_res": 8,
+            "id": "sm19529603"
+        },
+        {
+            "title": "12/11/16 ＭＢＡＡＣＣ高田馬場大会固定３on　その４",
+            "description_short": "↓ここで大会告知、動画報告をしています。是非フォローをば！↓http://page.mixi.jp/recent_page_feed.pl...",
+            "length": "12:05",
+            "first_retrieve": "2012-12-08 07:12:47",
+            "mylist_counter": 1,
+            "view_counter": 577,
+            "thumbnail_url": "http://tn-skr3.smilevideo.jp/smile?i=19529566",
+            "num_res": 1,
+            "id": "sm19529566"
+        }
+    ],
+    "page": 1
+}

@@ -1,0 +1,9 @@
+/samples/bot.cfg
+*.log
+
+# python
+*.pyc
+*.egg
+*.egg-info
+dist
+build

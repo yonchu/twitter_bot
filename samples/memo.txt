@@ -1,0 +1,175 @@
+## Twitter
+WebアプリにSNSアカウントでのログインを実装する （1/5）：CodeZine
+http://codezine.jp/article/detail/6572
+
+やる夫と Python で学ぶ Twitter の OAuth - YoshioriのBlog
+http://d.hatena.ne.jp/Yoshiori/20100929/1285727199
+
+http://www.kabipan.com/computer/twitter/
+
+最短 Twitter bot OAuth化対応 (Python編) - reppets.log
+http://d.hatena.ne.jp/reppets/20100522/1274553529
+
+tweepyを使ってみた - MacBook Airにミルクとチーズを
+http://d.hatena.ne.jp/akaneyuki/20110626/1309093504
+
+twitterAPI用pythonライブラリtweepyを使えるようになるまで。 - 六番
+http://no6.hatenablog.com/entry/20100116/1263631863
+
+TwitterのbotをOAuthに対応させる - しばそんノート
+http://d.hatena.ne.jp/shibason/20090802/1249204953
+
+ceanweb : Twitter API : Twitter ボットを作る (4)
+http://blog.livedoor.jp/oceanweb/archives/14903752.html
+
+https://dev.twitter.com/apps
+http://talkfast.org/2010/05/31/twitter-from-the-command-line-in-python-using-oauth/
+http://packages.python.org/tweepy/html/index.html
+http://watcher.moe-nifty.com/memo/docs/twitterAPI.txt
+
+
+## NicoNico
+ニコニコ動画APIとは (ニコニコドウガエーピーアイとは) [単語記事] - ニコニコ大百科
+http://dic.nicovideo.jp/a/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BBapi
+
+ http://res.nimg.jp/js/nicoapi.js
+
+日記的「駄目」プログラミング » ニコニコ動画に動画検索APIができたらしいので取り急ぎScalaで
+http://www.trinity-site.net/blog/?p=201
+
+ニコニコ動画のAPIまとめ | Web scratch
+http://efcl.info/wiki/niconicoapi/
+
+PHP5でニコニコ動画APIを利用する (WEB SEEKER)
+http://weblabo.sakura.ne.jp/blog/2009/01/php5api_1.html
+
+ニコニコのマイリストAPIの使い方 - lolloo-htnの日記
+http://d.hatena.ne.jp/lolloo-htn/20110115/1295105845
+
+urllib2でやっておいた方がよい初期設定 - lolloo-htnの日記
+http://d.hatena.ne.jp/lolloo-htn/20121104/1352061653
+
+☆
+takuan_osho / PyNico / source / pynico.py — Bitbucket
+https://bitbucket.org/takuan_osho/pynico/src/4643051f90d391b0be4f45ac858e6e761c02c4fa/pynico.py?at=default
+
+☆
+[nicoapi] - Tech Labo
+http://d.hatena.ne.jp/techlabo/searchdiary?word=%2a%5bnicoapi%5d
+
+PythonからYahooキーフレーズ抽出WebAPIを使う - Sticker@Something
+http://d.hatena.ne.jp/hikm/20110321/1300714396
+
+Web API — Python School 1.5.0 documentation
+http://skitazaki.github.com/python-school-ja/advanced/advanced-4.html
+
+
+## NicoNico(comments)
+
+ニコニコ動画API: getflvとコメントの取得 | ioaia blog＞＜；
+http://blog.hitobashira.org/?eid=24
+
+ニコニコ動画のAPIのメモ - picasの日記
+http://d.hatena.ne.jp/picas/20080202/1201955339
+
+じん's Diary 2nd ニコニコAPIメモ書き1
+http://okisaragi.blog136.fc2.com/blog-entry-22.html
+
+ニコニコ動画をダウンロードするには - 左脳Script
+http://n-yagi.0r2.net/script/2009/12/nico2downloader.html
+
+urllib2でCookieを使う - ひきメモ
+http://d.hatena.ne.jp/yumimue/20080101/1199148663
+
+python :: urllib2 でhttps通信したときのめも - ichirin2501の日記
+http://d.hatena.ne.jp/ichirin2501/20110428/1303924574
+
+Python: POST XML over HTTP
+http://www.gabrielgonzalezgarcia.com/2010/07/22/python-post-xml-over-http/
+
+How to POST an xml element in python - Stack Overflow
+http://stackoverflow.com/questions/3106459/how-to-post-an-xml-element-in-python
+
+HTTP XML Post using Python
+http://www.forceflow.be/2011/05/12/http-xml-post-using-python/
+
+NicoApiSpec - coroid project Wiki - SourceForge.JP
+http://en.sourceforge.jp/projects/coroid/wiki/NicoApiSpec
+
+ニコニコのコメント取得apiメモ
+http://anond.hatelabo.jp/20100719112127
+
+なとちゃんねる - ニコニコ動画のコメント解析
+http://kenapnet.blog.fc2.com/blog-entry-32.html
+
+
+## Youtube
+https://code.google.com/apis/console/
+
+Installation - Google APIs Client Library for Python — Google Developers
+https://developers.google.com/api-client-library/python/start/installation
+
+Zend Framework http://framework.zend.com/manual/1.12/ja/zend.gdata.youtube.html
+
+YouTube Data API - Searching with Freebase Topics - YouTube — Google Developers
+https://developers.google.com/youtube/v3/guides/searching_by_topic
+
+API Reference - YouTube — Google Developers
+https://developers.google.com/youtube/v3/docs/
+
+Search: list - YouTube — Google Developers
+https://developers.google.com/youtube/v3/docs/search/list
+
+YouTube Data API: Python Code Samples - YouTube — Google Developers
+https://developers.google.com/youtube/v3/code_samples/python#search
+
+Installation - Google APIs Client Library for Python — Google Developers
+https://developers.google.com/api-client-library/python/start/installation
+
+
+## SQLAlchemy
+もくじ — SQLAlchemy 0.6.5 ドキュメント (和訳) http://omake.accense.com/static/doc-ja/sqlalchemy/index.html
+
+紹介マニアどらふと版: Python の ORM 調査：SQLAlchemy編 http://www.sakito.com/2012/10/python-orm-sqlalchemy.html
+
+
+
+MAX = 4
+
+comment_len, title_len : trim_comment_len, trim_title_len
+1, 1 : 0, 0
+1, 2 : 0, 0
+1, 3 : 0, 0
+1, 4 : 0, 1
+  delta_tw_max = total_len - Max = 1
+  delta = title_len - comment_len = 3
+  if delta_tw_max < delta:
+    trim_comment_len = 0
+    trim_title_len = delta_tw_max
+
+2, 1 : 0, 0
+2, 2 : 0, 0
+2, 3 : 0, 1   delta_tw_max == delta
+2, 4 : 0, 2   delta_tw_max == delta
+  delta_tw_max = total_len - Max = 2
+  delta = title_len - comment_len = 2
+  if delta_tw_max == delta:
+    trim_comment_len = 0
+    trim_title_len = delta_tw_max
+
+3, 1 : 0, 0
+3, 2 : 1, 0   delta_tw_max == delta
+3, 3 : 1, 1   delta_tw_max(2) > delta(0)  trim(delta_tw_max / 2)
+3, 4 : 1, 2
+  delta_tw_max = total_len - Max = 3
+  delta = title_len - comment_len = 1
+  if delta_tw_max > delta:
+    trim_comment_len = delta
+    trim_title_len = 0
+    -> 3, 3
+
+
+4, 1 : 1, 0
+4, 2 : 2, 0
+4, 3 : 2, 1
+4, 4 : 2, 2

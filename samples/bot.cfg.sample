@@ -1,0 +1,13 @@
+[sample_bot]
+screen_name=sample_bot
+consumer_key=consumer_key
+consumer_secret=consumer_secret
+access_token=access_token
+access_token_secret=access_token_secret
+
+[niconico]
+user_id=xxxx@yyyy
+pass_word=pass_word
+
+[youtube]
+developer_key=developer_key
