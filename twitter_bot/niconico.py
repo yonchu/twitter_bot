@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+import calendar
 import cookielib
 import datetime
 import json
 import logging
+import sqlalchemy
 import traceback
 import time
 import urllib
@@ -15,6 +17,9 @@ import urlparse
 import xml.dom.minidom
 
 import pprint
+
+from database import DbManager
+from models import PostVideo
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +78,7 @@ class NicoComment(object):
             .format(self.comment, self.vpos, self.post_datetime)
 
 
-class NicoSearch(object):
+class NicoSearch(DbManager):
     LOGIN_URL = 'https://secure.nicovideo.jp/secure/login'
     SEARCH_URL = 'http://www.nicovideo.jp/api/search/search/'
     GETFLV_URL = 'http://flapi.nicovideo.jp/api/getflv/'
@@ -88,15 +93,17 @@ class NicoSearch(object):
 
     # (title, first_retrieve, url)
     TW_VIDEO_TWEET_FORMAT = 'ニコニコ動画 - {} [{}] | {}'.decode('utf-8')
+    # (title, first_retrieve, view_counter, num_res, url, mylist_counter)
+    TW_DETAIL_VIDEO_TWEET_FORMAT = '{} [投稿日:{}, 再生:{}, コメ:{}, マイリス:{}] | {}'.decode('utf-8')
     # (comment, vpos, post_datetime, title, url)
     TW_COMMENT_TWEET_FORMAT = '[コメント]{} ({})[{}] | {} {}'.decode('utf-8')
 
-    def __init__(self, user_id, pass_word, max_fetch_count=1,
-                 fetch_sleep_sec=1, max_retry_count=3, retry_sleep_sec=15,
-                 max_fetch_fail_count=2):
+    def __init__(self, user_id, pass_word, fetch_sleep_sec=1, max_retry_count=3,
+                 retry_sleep_sec=15, max_fetch_fail_count=2):
+        DbManager.__init__(self)
+
         self.user_id = user_id
         self.pass_word = pass_word
-        self.max_fetch_count = max_fetch_count
         self.fetch_sleep_sec = fetch_sleep_sec
         self.max_retry_count = max_retry_count
         self.retry_sleep_sec = retry_sleep_sec
@@ -144,18 +151,40 @@ class NicoSearch(object):
                 tweet_msgs.append(tweet_msg)
         return tweet_msgs
 
-    def search_videos(self, keyword, from_datetime=None, results=None, count=1,
-                      sort='f', order='d'):
+    def tweet_msgs_for_latest_commenting_videos(self, keyword, from_datetime=None,
+                                                number_of_results=3,
+                                                expire_days=30,
+                                                max_post_count=1):
+        tweet_msgs = []
+        # Search latest commenting videos by NicoNico.
+        videos = self.search_latest_commenting_videos(keyword, from_datetime,
+                                                      number_of_results,
+                                                      expire_days,
+                                                      max_post_count)
+        for video in videos:
+            # Make message to tweet.
+            str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
+            tweet_msg = NicoSearch.TW_DETAIL_VIDEO_TWEET_FORMAT \
+                                  .format(video.title, str_first_retrieve,
+                                          video.view_counter, video.num_res,
+                                          video.mylist_counter,
+                                          video.get_url())
+            tweet_msgs.append(tweet_msg)
+        return tweet_msgs
+
+    def search_videos(self, keyword, from_datetime=None, sort='f', order='d',
+                      page=1, max_count=1, current_count=1, results=None):
         results = results or []
+
         # Limit the number of fetching.
-        if count > self.max_fetch_count:
+        if current_count > max_count:
             return results
 
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
 
         # Fetch videos from NicoNico.
-        json_videos = self._fetch(self._fetch_videos, keyword, count, sort,
-                                  order)
+        json_videos = self._fetch(self._fetch_videos, keyword, sort, order,
+                                  page)
 
         for json_video in json_videos:
             video = NicoVideo(**json_video)
@@ -163,8 +192,10 @@ class NicoSearch(object):
                 continue
             results.append(video)
 
-        count += 1
-        return self.search_videos(keyword, from_datetime, results, count)
+        current_count += 1
+        page += 1
+        return self.search_videos(keyword, from_datetime, sort, order, page,
+                                  max_count, current_count, results)
 
     def search_videos_with_comments(self, keyword, from_datetime=None,
                                     max_comment_num=1500):
@@ -224,6 +255,63 @@ class NicoSearch(object):
                 results.append(video)
 
         return results
+
+    def search_latest_commenting_videos(self, keyword, from_datetime=None,
+                                        number_of_results=3, expire_days=30,
+                                        max_post_count=1, max_count=5,
+                                        current_count=1, results=None):
+        results = results or []
+
+        if current_count > max_count:
+            logger.error('Recursive count over: count='.format(current_count))
+            return results
+
+        from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
+
+        # Search latest commenting videos.
+        videos = self.search_videos(keyword, sort='n', page=current_count)
+        for video in videos:
+            # Check if the video is already posted.
+            old_post_video = self.db_session.query(PostVideo) \
+                .filter(sqlalchemy
+                        .and_(PostVideo.video_id == video.id)).first()
+
+            if old_post_video:
+                now_date = datetime.datetime.now()
+                delta_sec = calendar.timegm(now_date.timetuple()) \
+                    - calendar.timegm(old_post_video.last_post_datetime
+                                                    .timetuple())
+
+                # Convert days to sec.
+                expire_sec = expire_days * 60 * 60 * 24
+                if delta_sec < expire_sec and old_post_video.post_count >= max_post_count:
+                    logger.debug('Skip video: '
+                                 + 'video={}'.format(video)
+                                 + ', delta_sec={}'.format(delta_sec)
+                                 + ', expire_sec={}'.format(expire_sec))
+                    continue
+
+                # Update post video
+                old_post_video.post_count += 1
+                old_post_video.last_post_datetime = now_date
+            else:
+                # Add new post_video to database when not registerd
+                post_video = PostVideo(video.id)
+                logger.info('Add new post_video to database : post_video={}'.format(post_video))
+                self.db_session.add(post_video)
+
+            results.append(video)
+            if len(results) >= number_of_results:
+                return results
+
+        current_count += 1
+        return self.search_latest_commenting_videos(keyword, from_datetime,
+                                                    number_of_results,
+                                                    expire_days,
+                                                    max_post_count,
+                                                    max_count,
+                                                    current_count,
+                                                    results)
 
     def _make_tweet_msg_for_comments(self, comment, vpos, post_datetime, title,
                                      url):
@@ -294,7 +382,7 @@ class NicoSearch(object):
         time.sleep(self.fetch_sleep_sec)
         return result
 
-    def _fetch_videos(self, keyword, page=1, sort='f', order='d'):
+    def _fetch_videos(self, keyword, sort='f', order='d', page=1):
         """Searching by keyward, fetch videos from NicoNico.
         sort:
             f first_retrieve (default)

@@ -11,7 +11,7 @@ import tweepy
 
 import prettyprint
 from database import DbManager
-from models import Job, User
+from models import Job, User, PostVideo
 
 logger = logging.getLogger(__name__)
 
@@ -204,6 +204,8 @@ class TwitterBot(TwitterBotBase, DbManager):
         logger.info('Create database : db_name='.format(self.db_name))
         User.metadata.create_all(self.db_engine)
         Job.metadata.create_all(self.db_engine)
+        PostVideo.metadata.create_all(self.db_engine)
+
 
     def follow_not_following_users(self, limit=10):
         """Follow users who are not follow."""

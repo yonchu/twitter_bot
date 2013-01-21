@@ -205,66 +205,100 @@ class NicoVideoTest(unittest.TestCase):
 class NicoSearchTest(unittest.TestCase):
     def setUp(self):
         config = Config(BOT_CONFIG, section='niconico')
-        user_id = config.get_value('user_id')
-        pass_word = config.get_value('pass_word')
+        self.user_id = config.get_value('user_id')
+        self.pass_word = config.get_value('pass_word')
 
-        self.nico_search = NicoSearch(user_id, pass_word)
+        # Read config.
+        config = Config(SAMPLE_BOT_CONFIG, section='sample_bot')
+        self.consumer_key = config.get_value('consumer_key')
+        self.consumer_secret = config.get_value('consumer_secret')
+        self.access_token = config.get_value('access_token')
+        self.access_token_secret = config.get_value('access_token_secret')
+
+        with TwitterBot(self.consumer_key, self.consumer_secret,
+                        self.access_token, self.access_token_secret) as bot:
+            bot.create_database()
 
         self.from_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
 
     def test_make_tweet_msg_for_comments(self):
+        nico_search = NicoSearch(self.user_id, self.pass_word)
         post_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
 
         comment = 'x' * 10
         title = 'y' * 10
         url = 'u' * 10
-        msg = self.nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
+        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
         self.assertTrue(len(msg) < 140)
         self.assertEquals(msg, '[コメント]xxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyy uuuuuuuuuu')
 
         comment = 'x' * 10
         title = 'y' * 110
         url = 'u' * 10
-        msg = self.nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
+        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
         self.assertEquals(len(msg), 140)
         self.assertEquals(msg, '[コメント]xxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuu')
 
         comment = 'x' * 100
         title = 'y' * 20
         url = 'u' * 10
-        msg = self.nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
+        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
         self.assertEquals(len(msg), 140)
         self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyy uuuuuuuuuu')
 
         comment = 'x' * 100
         title = 'y' * 100
         url = 'u' * 10
-        msg = self.nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
+        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
         self.assertEquals(len(msg), 140)
         self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuu')
 
         comment = 'x' * 100
         title = 'y' * 100
         url = 'u' * 20 + 'U' * 5
-        msg = self.nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
+        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
         self.assertEquals(len(msg), 145)
         self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuuuuuuuuuuuuUUUUU')
 
     def test_tweet_msgs_for_latest_videos(self):
-        self.nico_search.login()
+        with NicoSearch(self.user_id, self.pass_word) as nico_search:
+            nico_search.login()
 
-        msgs = self.nico_search.tweet_msgs_for_latest_videos('mbaacc 馬場', self.from_datetime)
-        self.assertTrue(len(msgs) > 0)
-        for i, m in enumerate(msgs):
-            print('{} : {}'.format(i, m))
+            msgs = nico_search.tweet_msgs_for_latest_videos('mbaacc 馬場', self.from_datetime)
+            self.assertTrue(len(msgs) > 0)
+            for i, m in enumerate(msgs):
+                print('{} : {}'.format(i, m))
 
     def test_tweet_msgs_for_latest_comments(self):
-        self.nico_search.login()
+        with NicoSearch(self.user_id, self.pass_word) as nico_search:
+            nico_search.login()
 
-        msgs = self.nico_search.tweet_msgs_for_latest_comments('mbaacc', self.from_datetime)
-        self.assertTrue(len(msgs) > 0)
-        for i, m in enumerate(msgs):
-            print('{} : {}'.format(i, m))
+            msgs = nico_search.tweet_msgs_for_latest_comments('mbaacc', self.from_datetime)
+            self.assertTrue(len(msgs) > 0)
+            for i, m in enumerate(msgs):
+                print('{} : {}'.format(i, m))
+
+    def test_tweet_msgs_for_latest_commenting_videos(self):
+        with NicoSearch(self.user_id, self.pass_word) as nico_search:
+            nico_search.login()
+
+            msgs = nico_search.tweet_msgs_for_latest_commenting_videos('作業用BGM', self.from_datetime)
+            self.assertTrue(len(msgs) > 0)
+            for i, m in enumerate(msgs):
+                print('{} : {}'.format(i, m))
+
+    def test_tweet_msgs_for_latest_commenting_videos_exception(self):
+        try:
+            with NicoSearch(self.user_id, self.pass_word) as nico_search:
+                nico_search.login()
+
+                msgs = nico_search.tweet_msgs_for_latest_commenting_videos('作業用BGM', self.from_datetime)
+                self.assertTrue(len(msgs) > 0)
+                raise Exception('error test')
+        except:
+            return
+
+        self.fail('Do not occurs exception')
 
 
 class YoutubeSearchTest(unittest.TestCase):

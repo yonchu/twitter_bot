@@ -76,3 +76,29 @@ class User(Base):
         return "User<'{}',{}, {}, {}>" \
             .format(self.user_id, self.follow_status, self.follower_status,
                     self.date)
+
+
+class PostVideo(Base):
+    __tablename__ = 'post_video'
+
+    # video_id
+    video_id = sqlalchemy.Column(sqlalchemy.String, primary_key=True)
+
+    # last_post_datetime : Last datetime posted.
+    last_post_datetime = sqlalchemy.Column(sqlalchemy.DateTime)
+
+    # post_count
+    post_count = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __init__(self, video_id, last_post_datetime=None, post_count=1):
+        self.video_id = video_id
+        self.last_post_datetime = last_post_datetime or datetime.datetime.now()
+        self.post_count = post_count
+
+    def __str__(self):
+        return 'video_id={}, last_post_datetime={}, post_count={}' \
+            .format(self.video_id, self.last_post_datetime, self.post_count)
+
+    def __repr__(self):
+        return "Job<'{}','{}', {}>" \
+            .format(self.video_id, self.last_post_datetime, self.post_count)

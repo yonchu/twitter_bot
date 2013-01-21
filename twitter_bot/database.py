@@ -23,18 +23,31 @@ class DbManager(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # Check exception.
+        try:
+            if exc_type:
+                try:
+                    self.db_session.rollback()
+                except:
+                    logger.exception('DbManager.__exit__() is failed')
+            else:
+                self.db_session.commit()
+        finally:
+            self.close()
+
+        if exc_type:
+            return False
+        return True
+
+    def close(self):
         # Close db session.
         if self.db_session:
             try:
                 self.db_session.close()
             except:
                 logger.exception('Closing DB session is failed')
-        # Check exception.
-        if exc_type:
-            self.db_session = None
-            return False
-
-        return True
+            finally:
+                self.db_session = None
 
     def commit(self):
         if self.db_session:
