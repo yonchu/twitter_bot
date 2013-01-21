@@ -255,7 +255,7 @@ class NicoSearchTest(unittest.TestCase):
     def test_tweet_msgs_for_latest_videos(self):
         self.nico_search.login()
 
-        msgs = self.nico_search.tweet_msgs_for_latest_videos('mbaacc', self.from_datetime)
+        msgs = self.nico_search.tweet_msgs_for_latest_videos('mbaacc 馬場', self.from_datetime)
         self.assertTrue(len(msgs) > 0)
         for i, m in enumerate(msgs):
             print('{} : {}'.format(i, m))
@@ -278,7 +278,7 @@ class YoutubeSearchTest(unittest.TestCase):
 
     def test_tweet_msgs_for_latest_videos(self):
         from_datetime = datetime.datetime.strptime('2012-12-28 00:00:00', '%Y-%m-%d %H:%M:%S')
-        post_messages = self.youtube_search.tweet_msgs_for_latest_videos('mbaacc', from_datetime)
+        post_messages = self.youtube_search.tweet_msgs_for_latest_videos('mbaacc ランバト', from_datetime)
         for i, m in enumerate(post_messages):
             print('{} : {}'.format(i, m))
 

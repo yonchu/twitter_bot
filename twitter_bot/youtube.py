@@ -88,7 +88,7 @@ class YoutubeSearch(object):
                         developerKey=self.developer_key)
 
         search_response = youtube.search().list(
-            q=keyword,
+            q=keyword.encode('utf-8'),
             part='id,snippet',
             maxResults=32,
             type='video',

@@ -303,7 +303,8 @@ class NicoSearch(object):
             d date (default)
         """
         # Make url to search by keyword.
-        url = NicoSearch.SEARCH_URL + keyword.encode('utf-8')
+        keyword = urllib.quote(keyword.encode('utf-8'))
+        url = NicoSearch.SEARCH_URL + keyword
         params = {}
         params['mode'] = 'watch'
         params['sort'] = sort
