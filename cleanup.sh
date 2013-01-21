@@ -2,7 +2,7 @@
 cwd=$(cd "$(dirname "d0")" && pwd)
 
 list=(record.txt
-      sample_bot.db
+      twitter_bot.db
       twitter_bot.egg-info
       dist
       build)

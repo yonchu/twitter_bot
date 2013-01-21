@@ -21,7 +21,6 @@ class ConfigTest(unittest.TestCase):
 
     def test_simple(self):
         self.assertEquals(SAMPLE_BOT_CONFIG, (self.config.config_file))
-        self.assertEquals('sample_bot', self.config.get_value('screen_name', section='sample_bot'))
         self.assertEquals('consumer_key', self.config.get_value('consumer_key', section='sample_bot'))
         self.assertEquals('consumer_secret', self.config.get_value('consumer_secret', section='sample_bot'))
         self.assertEquals('access_token', self.config.get_value('access_token', section='sample_bot'))
@@ -93,24 +92,23 @@ class TwitterBotTest(unittest.TestCase):
     def setUp(self):
         # Read config.
         config = Config(SAMPLE_BOT_CONFIG, section='sample_bot')
-        self.screen_name = config.get_value('screen_name')
         self.consumer_key = config.get_value('consumer_key')
         self.consumer_secret = config.get_value('consumer_secret')
         self.access_token = config.get_value('access_token')
         self.access_token_secret = config.get_value('access_token_secret')
 
-        with TwitterBot(self.screen_name, self.consumer_key, self.consumer_secret,
+        with TwitterBot(self.consumer_key, self.consumer_secret,
                         self.access_token, self.access_token_secret) as bot:
             self.db_name = bot.db_name
 
     def testCreateDatabase(self):
-        with TwitterBot(self.screen_name, self.consumer_key, self.consumer_secret,
+        with TwitterBot(self.consumer_key, self.consumer_secret,
                         self.access_token, self.access_token_secret) as bot:
             bot.create_database()
-        self.assertTrue(os.path.isfile('sample_bot.db'))
+        self.assertTrue(os.path.isfile('twitter_bot.db'))
 
     def testJobManager(self):
-        with JobManager(self.db_name) as job_manager:
+        with JobManager() as job_manager:
             ## Register jobs.
             # Make func_and_intervals.
             # (function name, args, kwargs)

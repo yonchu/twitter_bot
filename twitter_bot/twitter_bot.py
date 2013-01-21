@@ -6,50 +6,19 @@ import calendar
 import datetime
 import logging
 import sqlalchemy
-import sqlalchemy.orm
-import sqlalchemy.ext.declarative
 import time
 import tweepy
 
 import prettyprint
+from database import DbManager
 from models import Job, User
 
 logger = logging.getLogger(__name__)
 
 
-class DbManager(object):
-    def __init__(self, db_name):
-        self.db_name = db_name
-
-    def __enter__(self):
-        # Create db session.
-        self.db_engine = sqlalchemy.create_engine(self.db_name)
-        Session = sqlalchemy.orm.sessionmaker(bind=self.db_engine)
-        self.db_session = Session()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # Close db session.
-        if self.db_session:
-            try:
-                self.db_session.close()
-            except:
-                logger.exception('Closing DB session is failed')
-        # Check exception.
-        if exc_type:
-            self.db_session = None
-            return False
-
-        return True
-
-    def commit(self):
-        if self.db_session:
-            self.db_session.commit()
-
-
 class JobManager(DbManager):
-    def __init__(self, db_name):
-        DbManager.__init__(self, db_name)
+    def __init__(self):
+        DbManager.__init__(self)
 
         # {'class name': instance}
         self.instances = {}
@@ -189,19 +158,15 @@ class TwitterBotBase(object):
 
 class TwitterBot(TwitterBotBase, DbManager):
     FOLLOW_MARGIN = 100
-    DB_NAME_FORMAT = 'sqlite:///{}.db'
 
-    def __init__(self, screen_name, consumer_key, consumer_secret,
+    def __init__(self, consumer_key, consumer_secret,
                  access_token, access_token_secret):
-        self.screen_name = screen_name
-        self.db_name = TwitterBot.DB_NAME_FORMAT.format(self.screen_name)
-
         # Init TwitterBotBase.
         TwitterBotBase.__init__(self, consumer_key, consumer_secret,
                                 access_token, access_token_secret)
 
         # Init DbManager.
-        DbManager.__init__(self, self.db_name)
+        DbManager.__init__(self)
 
     def _utc2datetime(self, utc_str):
         utc_time = time.strptime(utc_str, '%a %b %d %H:%M:%S +0000 %Y')

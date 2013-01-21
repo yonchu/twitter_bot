@@ -10,6 +10,8 @@ from niconico import NicoSearch, NicoVideo, NicoComment
 
 from youtube import YoutubeSearch, YoutubeVideo
 
+from database import DbManager
+
 from models import Job, User
 
-from twitter_bot import DbManager, JobManager, TwitterBotBase, TwitterBot
+from twitter_bot import JobManager, TwitterBotBase, TwitterBot
