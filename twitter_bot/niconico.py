@@ -167,8 +167,8 @@ class NicoSearch(object):
         return self.search_videos(keyword, from_datetime, results, count)
 
     def search_videos_with_comments(self, keyword, from_datetime=None,
-                                    max_comment_num=1500, results=None):
-        results = results or []
+                                    max_comment_num=1500):
+        results = []
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
 
         # Search videos with latest comments by NicoNico.
