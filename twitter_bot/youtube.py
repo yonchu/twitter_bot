@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from apiclient.discovery import build
+import calendar
 import datetime
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -29,11 +31,20 @@ class YoutubeVideo(object):
         return 'NicoVideo<{}, {}, {}>'.format(self.title, self.id,
                                               self.nico_comments)
 
+    @classmethod
+    def _utc2datetime(cls, utc_str):
+        if utc_str.endswith('Z'):
+            utc_str = utc_str[:-5]
+        utc_time = time.strptime(utc_str, '%Y-%m-%dT%H:%M:%S')
+        jst_time = time.localtime(calendar.timegm(utc_time))
+        jst_datetime = datetime.datetime(*jst_time[:6])
+        return jst_datetime
+
     def get_url(self):
         return YoutubeVideo.VIDEO_URL + self.vide_id
 
     @classmethod
-    def fromResponse(self, response):
+    def fromResponse(cls, response):
         video_id = response['id']['videoId']
         title = response['snippet']['title'].encode('utf-8')
         channel_id = response['snippet']['channelId']
@@ -41,10 +52,8 @@ class YoutubeVideo(object):
         thumbnails = response['snippet']['thumbnails']
 
         published_at = response['snippet']['publishedAt']
-        if published_at.endswith('Z'):
-            published_at = published_at[:-5]
-        published_at = datetime.datetime.strptime(published_at,
-                                                  '%Y-%m-%dT%H:%M:%S')
+        published_at = cls._utc2datetime(published_at)
+
         yv = YoutubeVideo(video_id, channel_id, description, published_at,
                           thumbnails, title)
         return yv
