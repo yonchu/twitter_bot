@@ -218,7 +218,7 @@ class TwitterBot(TwitterBotBase, DbManager):
 
     def create_database(self):
         """Create database and table definition."""
-        logger.info('Create database : db_name='.format(self.db_name))
+        logger.info('Create database : db_name={}'.format(self.db_name))
         User.metadata.create_all(self.db_engine)
         Job.metadata.create_all(self.db_engine)
         PostVideo.metadata.create_all(self.db_engine)
