@@ -14,12 +14,12 @@ class DbManager(object):
 
     def __init__(self):
         self.db_name = DbManager.DB_NAME
-
-    def __enter__(self):
         # Create db session.
         self.db_engine = sqlalchemy.create_engine(self.db_name)
         Session = sqlalchemy.orm.sessionmaker(bind=self.db_engine)
         self.db_session = Session()
+
+    def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -27,11 +27,11 @@ class DbManager(object):
         try:
             if exc_type:
                 try:
-                    self.db_session.rollback()
+                    self.rollback()
                 except:
                     logger.exception('DbManager.__exit__() is failed')
             else:
-                self.db_session.commit()
+                self.commit()
         finally:
             self.close()
 
@@ -52,3 +52,7 @@ class DbManager(object):
     def commit(self):
         if self.db_session:
             self.db_session.commit()
+
+    def rollback(self):
+        if self.db_session:
+            self.db_session.rollback()
