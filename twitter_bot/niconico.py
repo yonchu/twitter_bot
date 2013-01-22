@@ -219,7 +219,8 @@ class NicoSearch(DbManager):
                                             traceback.format_exc()))
                 logger.exception('_fetch_comments() failed but continue')
                 sleep_sec = self.retry_sleep_sec * self.max_retry_count * 2
-                logger.info('Sleep {}sec...'.format(sleep_sec))
+                logger.info('Sleep {}sec... (_fetch_comments() failed)'
+                            .format(sleep_sec))
                 time.sleep(sleep_sec)
                 continue
 
@@ -366,11 +367,10 @@ class NicoSearch(DbManager):
                 retry_count = self.max_retry_count - remaining_retry_count
                 if retry_count > 0:
                     sleep_sec = self.retry_sleep_sec * retry_count
-                    logger.info('Sleep {}sec...'.format(sleep_sec))
+                    logger.info('Sleep {}sec... Retry {}: {}({}, {})'
+                                .format(sleep_sec, retry_count, func.__name__,
+                                        args, kwargs))
                     time.sleep(sleep_sec)
-                    logger.info('Retry {}: {}({}, {})'
-                                .format(retry_count, func.__name__, args,
-                                        kwargs))
                 # Run fetch function.
                 result = func(*args, **kwargs)
                 break
