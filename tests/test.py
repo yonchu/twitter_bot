@@ -24,10 +24,10 @@ class ConfigTest(unittest.TestCase):
 
     def test_simple(self):
         self.assertEquals(SAMPLE_BOT_CONFIG, (self.config.config_file))
-        self.assertEquals('consumer_key', self.config.get_value('consumer_key', section='twitter_bot'))
-        self.assertEquals('consumer_secret', self.config.get_value('consumer_secret', section='twitter_bot'))
-        self.assertEquals('access_token', self.config.get_value('access_token', section='twitter_bot'))
-        self.assertEquals('access_token_secret', self.config.get_value('access_token_secret', section='twitter_bot'))
+        self.assertEquals('consumer_key', self.config.get_value('consumer_key', section='twitter'))
+        self.assertEquals('consumer_secret', self.config.get_value('consumer_secret', section='twitter'))
+        self.assertEquals('access_token', self.config.get_value('access_token', section='twitter'))
+        self.assertEquals('access_token_secret', self.config.get_value('access_token_secret', section='twitter'))
 
         self.assertEquals('xxxx@yyyy', self.config.get_value('user_id', section='niconico'))
         self.assertEquals('pass_word', self.config.get_value('pass_word', section='niconico'))

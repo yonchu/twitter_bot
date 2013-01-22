@@ -124,7 +124,7 @@ class JobManager(DbManager):
 
 
 class TwitterBotBase(object):
-    CONFIG_SECTION_TWITTER_BOT = 'twitter_bot'
+    CONFIG_SECTION_TWITTER_BOT = 'twitter'
 
     def __init__(self, bot_config):
         logger.debug('Read config file: {}'.format(bot_config))
