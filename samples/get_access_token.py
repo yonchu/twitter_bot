@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  Description
+# https://dev.twitter.com/apps
 #
 
 from __future__ import print_function
 import tweepy
 
-# https://dev.twitter.com/apps
-CONSUMER_KEY = ''
-CONSUMER_SECRET = ''
-
 
 def main():
     """main function"""
-    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    consumer_key = raw_input('Consumer key: ').strip()
+    consumer_secret = raw_input('Consumer secret: ').strip()
+
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth_url = auth.get_authorization_url()
 
-    print('Please authorize: ' + auth_url)
+    print('Access to authorize by browser: ' + auth_url)
     verifier = raw_input('PIN: ').strip()
 
     auth.get_access_token(verifier)
