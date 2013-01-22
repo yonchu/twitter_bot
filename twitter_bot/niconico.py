@@ -223,6 +223,8 @@ class NicoSearch(DbManager):
                 time.sleep(sleep_sec)
                 continue
 
+            if not result:
+                continue
             dom = xml.dom.minidom.parseString(result.read())
 
             chats = dom.getElementsByTagName('chat')
@@ -415,6 +417,8 @@ class NicoSearch(DbManager):
         """Fetch comments from NicoNico."""
         message_server_url, post_xml = self._fetch(self._fetch_comment_info,
                                                    video.id)
+        if not (message_server_url or post_xml):
+            return None
 
         headers = {'Content-Type': 'text/xml',
                    'Content-Length': "{}".format(len(post_xml))}
@@ -435,6 +439,10 @@ class NicoSearch(DbManager):
                             + pprint.pformat(result))
 
         # Message server URL.
+        if not 'ms' in result or len(result['ms']) < 1:
+            logger.error('Could not get message server url: result={}'
+                         .format(result))
+            return None, None
         ms = result['ms'][0]
 
         thread_id = result['thread_id'][0]
