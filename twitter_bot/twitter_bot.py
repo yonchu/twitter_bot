@@ -146,11 +146,11 @@ class TwitterBotBase(object):
         auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api = tweepy.API(auth)
-        self.test = False
+        self.is_test = False
 
     def tweet_msg(self, msg):
         logger.info('Tweet : {}'.format(msg))
-        if not self.test:
+        if not self.is_test:
             self.api.update_status(msg)
 
     def tweet_msgs(self, msgs, sleep_time_sec=1):
