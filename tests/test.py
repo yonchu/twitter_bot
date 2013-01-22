@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 import datetime
+import logging
 import os
 import unittest
 
@@ -12,6 +13,8 @@ from twitter_bot import (Config, NicoSearch, NicoVideo, NicoComment,
 
 SAMPLE_BOT_CONFIG = 'samples/bot.cfg.sample'
 BOT_CONFIG = 'samples/bot.cfg'
+
+logging.basicConfig(level=logging.INFO)
 
 
 class ConfigTest(unittest.TestCase):
