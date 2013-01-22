@@ -21,10 +21,10 @@ class ConfigTest(unittest.TestCase):
 
     def test_simple(self):
         self.assertEquals(SAMPLE_BOT_CONFIG, (self.config.config_file))
-        self.assertEquals('consumer_key', self.config.get_value('consumer_key', section='sample_bot'))
-        self.assertEquals('consumer_secret', self.config.get_value('consumer_secret', section='sample_bot'))
-        self.assertEquals('access_token', self.config.get_value('access_token', section='sample_bot'))
-        self.assertEquals('access_token_secret', self.config.get_value('access_token_secret', section='sample_bot'))
+        self.assertEquals('consumer_key', self.config.get_value('consumer_key', section='twitter_bot'))
+        self.assertEquals('consumer_secret', self.config.get_value('consumer_secret', section='twitter_bot'))
+        self.assertEquals('access_token', self.config.get_value('access_token', section='twitter_bot'))
+        self.assertEquals('access_token_secret', self.config.get_value('access_token_secret', section='twitter_bot'))
 
         self.assertEquals('xxxx@yyyy', self.config.get_value('user_id', section='niconico'))
         self.assertEquals('pass_word', self.config.get_value('pass_word', section='niconico'))
@@ -54,11 +54,9 @@ class ModelsTest(unittest.TestCase):
 
 
 class SampleBot(TwitterBotBase):
-    def __init__(self, consumer_key, consumer_secret,
-                 access_token, access_token_secret):
+    def __init__(self, bot_config):
         # Init TwitterBotBase.
-        TwitterBotBase.__init__(self, consumer_key, consumer_secret,
-                                access_token, access_token_secret)
+        TwitterBotBase.__init__(self, bot_config)
         self.post1_args = None
         self.post1_kwargs = None
 
@@ -90,20 +88,10 @@ class SampleBot(TwitterBotBase):
 
 class TwitterBotTest(unittest.TestCase):
     def setUp(self):
-        # Read config.
-        config = Config(SAMPLE_BOT_CONFIG, section='sample_bot')
-        self.consumer_key = config.get_value('consumer_key')
-        self.consumer_secret = config.get_value('consumer_secret')
-        self.access_token = config.get_value('access_token')
-        self.access_token_secret = config.get_value('access_token_secret')
-
-        with TwitterBot(self.consumer_key, self.consumer_secret,
-                        self.access_token, self.access_token_secret) as bot:
-            self.db_name = bot.db_name
+        pass
 
     def testCreateDatabase(self):
-        with TwitterBot(self.consumer_key, self.consumer_secret,
-                        self.access_token, self.access_token_secret) as bot:
+        with TwitterBot(SAMPLE_BOT_CONFIG) as bot:
             bot.create_database()
         self.assertTrue(os.path.isfile('twitter_bot.db'))
 
@@ -127,7 +115,7 @@ class TwitterBotTest(unittest.TestCase):
             func_and_intervals.append(func_tuple)
 
             # Register.
-            bot = SampleBot('', '', '', '')
+            bot = SampleBot(SAMPLE_BOT_CONFIG)
             job_manager.register_jobs(bot, func_and_intervals)
 
             self.assertTrue(bot.post1_args is None)
@@ -208,15 +196,7 @@ class NicoSearchTest(unittest.TestCase):
         self.user_id = config.get_value('user_id')
         self.pass_word = config.get_value('pass_word')
 
-        # Read config.
-        config = Config(SAMPLE_BOT_CONFIG, section='sample_bot')
-        self.consumer_key = config.get_value('consumer_key')
-        self.consumer_secret = config.get_value('consumer_secret')
-        self.access_token = config.get_value('access_token')
-        self.access_token_secret = config.get_value('access_token_secret')
-
-        with TwitterBot(self.consumer_key, self.consumer_secret,
-                        self.access_token, self.access_token_secret) as bot:
+        with TwitterBot(SAMPLE_BOT_CONFIG) as bot:
             bot.create_database()
 
         self.from_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')

@@ -10,6 +10,7 @@ import time
 import tweepy
 
 import prettyprint
+from config import Config
 from database import DbManager
 from models import Job, User, PostVideo
 
@@ -121,11 +122,29 @@ class JobManager(DbManager):
 
 
 class TwitterBotBase(object):
-    def __init__(self, consumer_key, consumer_secret,
-                 access_token, access_token_secret):
+    CONFIG_SECTION_TWITTER_BOT = 'twitter_bot'
+
+    def __init__(self, bot_config):
+        logger.debug('Read config file: {}'.format(bot_config))
+
+        # Read twitter_bot config.
+        self.config = Config(bot_config)
+        self.consumer_key = \
+            self.config.get_value('consumer_key',
+                                  section=TwitterBotBase.CONFIG_SECTION_TWITTER_BOT)
+        self.consumer_secret = \
+            self.config.get_value('consumer_secret',
+                                  section=TwitterBotBase.CONFIG_SECTION_TWITTER_BOT)
+        self.access_token = \
+            self.config.get_value('access_token',
+                                  section=TwitterBotBase.CONFIG_SECTION_TWITTER_BOT)
+        self.access_token_secret = \
+            self.config.get_value('access_token_secret',
+                                  section=TwitterBotBase.CONFIG_SECTION_TWITTER_BOT)
+
         # Create tweepy api.
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
+        auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
+        auth.set_access_token(self.access_token, self.access_token_secret)
         self.api = tweepy.API(auth)
         self.test = False
 
@@ -159,11 +178,9 @@ class TwitterBotBase(object):
 class TwitterBot(TwitterBotBase, DbManager):
     FOLLOW_MARGIN = 100
 
-    def __init__(self, consumer_key, consumer_secret,
-                 access_token, access_token_secret):
+    def __init__(self, bot_config):
         # Init TwitterBotBase.
-        TwitterBotBase.__init__(self, consumer_key, consumer_secret,
-                                access_token, access_token_secret)
+        TwitterBotBase.__init__(self, bot_config)
 
         # Init DbManager.
         DbManager.__init__(self)
@@ -205,7 +222,6 @@ class TwitterBot(TwitterBotBase, DbManager):
         User.metadata.create_all(self.db_engine)
         Job.metadata.create_all(self.db_engine)
         PostVideo.metadata.create_all(self.db_engine)
-
 
     def follow_not_following_users(self, limit=10):
         """Follow users who are not follow."""
