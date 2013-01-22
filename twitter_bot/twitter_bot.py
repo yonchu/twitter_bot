@@ -13,6 +13,8 @@ import prettyprint
 from config import Config
 from database import DbManager
 from models import Job, User, PostVideo
+from niconico import NicoSearch
+from youtube import YoutubeSearch
 
 logger = logging.getLogger(__name__)
 
@@ -370,3 +372,51 @@ class TwitterBot(TwitterBotBase, DbManager):
 
         self.commit()
         logger.debug('Return update_database()')
+
+
+class TwitterVideoBot(TwitterBotBase):
+    def __init__(self, bot_config):
+        # Init TwitterBotBase.
+        TwitterBotBase.__init__(self, bot_config)
+
+        self.nico_user_id = self.config.get_value('user_id', section='niconico')
+        self.nico_pass_word = self.config.get_value('pass_word', section='niconico')
+        self.youtube_developer_key = self.config.get_value('developer_key',
+                                                           section='youtube')
+
+    def nico_video_post(self, search_keyword, prev_datetime):
+        with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
+            nico = NicoSearch(self.nico_user_id, self.nico_pass_word)
+            nico.login()
+            tweet_msgs = nico.tweet_msgs_for_latest_videos(search_keyword,
+                                                           prev_datetime)
+            if not tweet_msgs:
+                logger.info('nico_video_post(): No tweet messages')
+            self.tweet_msgs(tweet_msgs)
+
+    def nico_comment_post(self, search_keyword, prev_datetime):
+        with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
+            nico = NicoSearch(self.nico_user_id, self.nico_pass_word)
+            nico.login()
+            tweet_msgs = nico.tweet_msgs_for_latest_comments(search_keyword,
+                                                             prev_datetime)
+            if not tweet_msgs:
+                logger.info('nico_comment_post(): No tweet messages')
+            self.tweet_msgs(tweet_msgs)
+
+    def nico_latest_commenting_video(self, search_keyword, prev_datetime):
+        with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
+            nico.login()
+            tweet_msgs = nico.tweet_msgs_for_latest_commenting_videos(search_keyword,
+                                                                      prev_datetime)
+            if not tweet_msgs:
+                logger.info('nico_latest_commenting_video(): No tweet messages')
+            self.tweet_msgs(tweet_msgs)
+
+    def youtube_video_post(self, search_keyword, prev_datetime):
+        youtube = YoutubeSearch(self.youtube_developer_key)
+        tweet_msgs = youtube.tweet_msgs_for_latest_videos(search_keyword,
+                                                          prev_datetime)
+        if not tweet_msgs:
+            logger.info('youtube_video_post(): No tweet messages')
+        self.tweet_msgs(tweet_msgs)

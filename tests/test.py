@@ -8,8 +8,8 @@ import os
 import unittest
 
 from twitter_bot import (Config, NicoSearch, NicoVideo, NicoComment,
-                         YoutubeSearch, JobManager,
-                         TwitterBot, TwitterBotBase, Job, User)
+                         JobManager, TwitterBot, TwitterBotBase,
+                         TwitterVideoBot, Job, User)
 
 SAMPLE_BOT_CONFIG = 'samples/bot.cfg.sample'
 BOT_CONFIG = 'samples/bot.cfg'
@@ -193,6 +193,34 @@ class NicoVideoTest(unittest.TestCase):
         self.assertTrue(latest_comments[2] is self.nc3)
 
 
+class TwitterVideoBotTest(unittest.TestCase):
+    def setUp(self):
+        with TwitterBot(BOT_CONFIG) as bot:
+            bot.create_database()
+
+        self.prev_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+
+    def test_nico_video_post(self):
+        bot = TwitterVideoBot(BOT_CONFIG)
+        bot.is_test = True
+        bot.nico_video_post('mbaacc 馬場', self.prev_datetime)
+
+    def test_nico_comment_post(self):
+        bot = TwitterVideoBot(BOT_CONFIG)
+        bot.is_test = True
+        bot.nico_comment_post('mbaacc', self.prev_datetime)
+
+    def test_nico_latest_commenting_video(self):
+        bot = TwitterVideoBot(BOT_CONFIG)
+        bot.is_test = True
+        bot.nico_latest_commenting_video('作業用BGM', self.prev_datetime)
+
+    def test_youtube_video_post(self):
+        bot = TwitterVideoBot(BOT_CONFIG)
+        bot.is_test = True
+        bot.youtube_video_post('mbaacc', self.prev_datetime)
+
+
 class NicoSearchTest(unittest.TestCase):
     def setUp(self):
         config = Config(BOT_CONFIG, section='niconico')
@@ -243,33 +271,6 @@ class NicoSearchTest(unittest.TestCase):
         self.assertEquals(len(msg), 145)
         self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuuuuuuuuuuuuUUUUU')
 
-    def test_tweet_msgs_for_latest_videos(self):
-        with NicoSearch(self.user_id, self.pass_word) as nico_search:
-            nico_search.login()
-
-            msgs = nico_search.tweet_msgs_for_latest_videos('mbaacc 馬場', self.from_datetime)
-            self.assertTrue(len(msgs) > 0)
-            for i, m in enumerate(msgs):
-                print('{} : {}'.format(i, m))
-
-    def test_tweet_msgs_for_latest_comments(self):
-        with NicoSearch(self.user_id, self.pass_word) as nico_search:
-            nico_search.login()
-
-            msgs = nico_search.tweet_msgs_for_latest_comments('mbaacc', self.from_datetime)
-            self.assertTrue(len(msgs) > 0)
-            for i, m in enumerate(msgs):
-                print('{} : {}'.format(i, m))
-
-    def test_tweet_msgs_for_latest_commenting_videos(self):
-        with NicoSearch(self.user_id, self.pass_word) as nico_search:
-            nico_search.login()
-
-            msgs = nico_search.tweet_msgs_for_latest_commenting_videos('作業用BGM', self.from_datetime)
-            self.assertTrue(len(msgs) > 0)
-            for i, m in enumerate(msgs):
-                print('{} : {}'.format(i, m))
-
     def test_tweet_msgs_for_latest_commenting_videos_exception(self):
         try:
             with NicoSearch(self.user_id, self.pass_word) as nico_search:
@@ -282,22 +283,6 @@ class NicoSearchTest(unittest.TestCase):
             return
 
         self.fail('Do not occurs exception')
-
-
-class YoutubeSearchTest(unittest.TestCase):
-    def setUp(self):
-        config = Config(BOT_CONFIG, section='youtube')
-        developer_key = config.get_value('developer_key')
-
-        self.youtube_search = YoutubeSearch(developer_key)
-
-    def test_tweet_msgs_for_latest_videos(self):
-        from_datetime = datetime.datetime.strptime('2012-12-28 00:00:00', '%Y-%m-%d %H:%M:%S')
-        post_messages = self.youtube_search.tweet_msgs_for_latest_videos('mbaacc ランバト', from_datetime)
-        for i, m in enumerate(post_messages):
-            print('{} : {}'.format(i, m))
-
-        self.assertTrue(True)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
