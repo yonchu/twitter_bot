@@ -100,7 +100,7 @@ class YoutubeSearch(object):
             if YoutubeVideo.is_video(video):
                 youtube_video = YoutubeVideo.fromResponse(video)
                 if youtube_video.published_at < from_datetime:
-                    break
+                    continue
                 videos.append(youtube_video)
 
         return videos
