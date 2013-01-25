@@ -107,28 +107,30 @@ class YoutubeSearch(object):
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
         logger.debug('Call search_videos({}, {})'.format(keyword, from_datetime))
 
-        youtube = build(YoutubeSearch.API_SERVICE_NAME,
-                        YoutubeSearch.API_VERSION,
-                        developerKey=self.developer_key)
+        video_dict = {}
+        for i in range(1, 3):
+            youtube = build(YoutubeSearch.API_SERVICE_NAME,
+                            YoutubeSearch.API_VERSION,
+                            developerKey=self.developer_key)
 
-        search_response = youtube.search().list(
-            q=keyword.encode('utf-8'),
-            part='id,snippet',
-            type='video',
-            order='date',
-            maxResults=32,
-            publishedAfter=self._jst_datetime2utc_str(from_datetime),
-        ).execute()
+            search_response = youtube.search().list(
+                q=keyword.encode('utf-8'),
+                part='id,snippet',
+                maxResults=32,
+                type='video',
+                order='date',
+                publishedAfter=self._jst_datetime2utc_str(from_datetime),
+            ).execute()
 
-        videos = []
-        for video in search_response.get('items', []):
-            if not YoutubeVideo.is_video(video):
-                continue
-            youtube_video = YoutubeVideo.fromResponse(video)
-            logger.debug('youtube_video={}'.format(youtube_video))
+            for video in search_response.get('items', []):
+                if not YoutubeVideo.is_video(video):
+                    continue
+                youtube_video = YoutubeVideo.fromResponse(video)
+                logger.debug('youtube_video={}'.format(youtube_video))
 
-            if youtube_video.published_at < from_datetime:
-                continue
-            videos.append(youtube_video)
+                if youtube_video.published_at < from_datetime:
+                    continue
+                if not youtube_video.video_id in video_dict:
+                    video_dict[youtube_video.video_id] = youtube_video
 
-        return videos
+        return video_dict.values()

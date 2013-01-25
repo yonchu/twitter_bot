@@ -198,7 +198,8 @@ class TwitterVideoBotTest(unittest.TestCase):
         with TwitterBot(BOT_CONFIG) as bot:
             bot.create_database()
 
-        self.prev_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+        self.prev_datetime = datetime.datetime.now()
+        self.prev_datetime = self.prev_datetime - datetime.timedelta(1)
 
     def test_nico_video_post(self):
         bot = TwitterVideoBot(BOT_CONFIG)
