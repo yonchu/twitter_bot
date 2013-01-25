@@ -80,8 +80,16 @@ class YoutubeSearch(object):
     def __init__(self, developer_key):
         self.developer_key = developer_key
 
+    def _jst_datetime2utc_str(self, jst_datetime):
+        utc_struct_time = time.gmtime(time.mktime(jst_datetime.timetuple()))
+        utc_str = time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_struct_time)
+        #utc_dt = datetime.fromtimestamp(time.mktime(utc_struct_time))
+        #return datetime.datetime(*utc_struct_time[:6])
+        return utc_str
+
     def tweet_msgs_for_latest_videos(self, keyword, from_datetime):
-        logger.debug('Call tweet_msgs_for_latest_videos({}, {})'.format(keyword, from_datetime))
+        logger.debug('Call tweet_msgs_for_latest_videos({}, {})'
+                     .format(keyword, from_datetime))
         videos = self.search_videos(keyword, from_datetime)
 
         # Make tweet message.
@@ -97,6 +105,7 @@ class YoutubeSearch(object):
 
     def search_videos(self, keyword, from_datetime=None):
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
+        logger.debug('Call search_videos({}, {})'.format(keyword, from_datetime))
 
         youtube = build(YoutubeSearch.API_SERVICE_NAME,
                         YoutubeSearch.API_VERSION,
@@ -105,18 +114,21 @@ class YoutubeSearch(object):
         search_response = youtube.search().list(
             q=keyword.encode('utf-8'),
             part='id,snippet',
-            maxResults=32,
             type='video',
             order='date',
+            maxResults=32,
+            publishedAfter=self._jst_datetime2utc_str(from_datetime),
         ).execute()
 
         videos = []
         for video in search_response.get('items', []):
-            if YoutubeVideo.is_video(video):
-                youtube_video = YoutubeVideo.fromResponse(video)
-                logger.debug('youtube_video={}'.format(youtube_video))
-                if youtube_video.published_at < from_datetime:
-                    continue
-                videos.append(youtube_video)
+            if not YoutubeVideo.is_video(video):
+                continue
+            youtube_video = YoutubeVideo.fromResponse(video)
+            logger.debug('youtube_video={}'.format(youtube_video))
+
+            if youtube_video.published_at < from_datetime:
+                continue
+            videos.append(youtube_video)
 
         return videos
