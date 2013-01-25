@@ -15,33 +15,37 @@ class YoutubeVideo(object):
 
     def __init__(self, video_id, channel_id, description, published_at,
                  thumbnails, title):
-        self.vide_id = video_id
+        self.video_id = video_id
         self.channel_id = channel_id
         self.description = description
         self.published_at = published_at
         self.thumbnails = thumbnails
         self.title = title
 
+        self.utc_published_at = None
+
     def __str__(self):
-        return 'vide_id={}, title={}, published_at={}'.format(self.title,
-                                                              self.id,
-                                                              self.nico_comments)
+        return 'video_id={}, title={}, utc_published_at={}, published_at={}' \
+            .format(self.video_id, self.title, self.utc_published_at,
+                    self.published_at)
 
     def __repr__(self):
-        return 'NicoVideo<{}, {}, {}>'.format(self.title, self.id,
-                                              self.nico_comments)
+        return 'NicoVideo<{}, {}, {}, {}>'.format(self.video_id, self.title,
+                                                  self.utc_published_at,
+                                                  self.published_at)
 
     @classmethod
-    def _utc2datetime(cls, utc_str):
-        if utc_str.endswith('Z'):
-            utc_str = utc_str[:-5]
+    def _utc_str2jst_datetime(cls, utc_str):
+        if not utc_str.endswith('Z'):
+            raise ValueError('Unknown format: {}'.format(utc_str))
+        utc_str = utc_str[:-5]
         utc_time = time.strptime(utc_str, '%Y-%m-%dT%H:%M:%S')
         jst_time = time.localtime(calendar.timegm(utc_time))
         jst_datetime = datetime.datetime(*jst_time[:6])
         return jst_datetime
 
     def get_url(self):
-        return YoutubeVideo.VIDEO_URL + self.vide_id
+        return YoutubeVideo.VIDEO_URL + self.video_id
 
     @classmethod
     def fromResponse(cls, response):
@@ -51,11 +55,12 @@ class YoutubeVideo(object):
         description = response['snippet']['description']
         thumbnails = response['snippet']['thumbnails']
 
-        published_at = response['snippet']['publishedAt']
-        published_at = cls._utc2datetime(published_at)
+        utc_published_at = response['snippet']['publishedAt']
+        published_at = cls._utc_str2jst_datetime(utc_published_at)
 
         yv = YoutubeVideo(video_id, channel_id, description, published_at,
                           thumbnails, title)
+        yv.utc_published_at = utc_published_at
         return yv
 
     @classmethod
@@ -76,6 +81,7 @@ class YoutubeSearch(object):
         self.developer_key = developer_key
 
     def tweet_msgs_for_latest_videos(self, keyword, from_datetime):
+        logger.debug('Call tweet_msgs_for_latest_videos({}, {})'.format(keyword, from_datetime))
         videos = self.search_videos(keyword, from_datetime)
 
         # Make tweet message.
@@ -108,6 +114,7 @@ class YoutubeSearch(object):
         for video in search_response.get('items', []):
             if YoutubeVideo.is_video(video):
                 youtube_video = YoutubeVideo.fromResponse(video)
+                logger.debug('youtube_video={}'.format(youtube_video))
                 if youtube_video.published_at < from_datetime:
                     continue
                 videos.append(youtube_video)
