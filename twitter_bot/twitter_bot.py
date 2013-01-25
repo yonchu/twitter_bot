@@ -394,12 +394,13 @@ class TwitterVideoBot(TwitterBotBase):
                 logger.info('nico_video_post(): No tweet messages')
             self.tweet_msgs(tweet_msgs)
 
-    def nico_comment_post(self, search_keyword, prev_datetime):
+    def nico_comment_post(self, search_keyword, prev_datetime, filter_func=None):
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
             nico = NicoSearch(self.nico_user_id, self.nico_pass_word)
             nico.login()
             tweet_msgs = nico.tweet_msgs_for_latest_comments(search_keyword,
-                                                             prev_datetime)
+                                                             prev_datetime,
+                                                             filter_func=filter_func)
             if not tweet_msgs:
                 logger.info('nico_comment_post(): No tweet messages')
             self.tweet_msgs(tweet_msgs)

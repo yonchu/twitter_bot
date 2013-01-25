@@ -193,6 +193,9 @@ class NicoVideoTest(unittest.TestCase):
         self.assertTrue(latest_comments[2] is self.nc3)
 
 
+NG_ID = ['sm16284937', 'sm19370827', 'sm14276357', 'sm16577879', 'sm16570187', 'sm18308612', 'sm18976851', 'sm19644424']
+
+
 class TwitterVideoBotTest(unittest.TestCase):
     def setUp(self):
         with TwitterBot(BOT_CONFIG) as bot:
@@ -209,7 +212,12 @@ class TwitterVideoBotTest(unittest.TestCase):
     def test_nico_comment_post(self):
         bot = TwitterVideoBot(BOT_CONFIG)
         bot.is_test = True
-        bot.nico_comment_post('mbaacc', self.prev_datetime)
+        bot.nico_comment_post('mbaacc', self.prev_datetime, self.filter_func)
+
+    def filter_func(self, video):
+        if video.id in NG_ID:
+            return True
+        return False
 
     def test_nico_latest_commenting_video(self):
         bot = TwitterVideoBot(BOT_CONFIG)

@@ -135,12 +135,15 @@ class NicoSearch(DbManager):
 
     def tweet_msgs_for_latest_comments(self, keyword, from_datetime,
                                        max_comment_num=1500,
-                                       max_tweet_num_per_video=3):
+                                       max_tweet_num_per_video=3,
+                                       filter_func=None):
         tweet_msgs = []
         # Search latest comments by NicoNico.
         videos = self.search_videos_with_comments(keyword, from_datetime,
                                                   max_comment_num)
         for video in videos:
+            if filter_func and filter_func(video):
+                continue
             for nico_comment in video.get_latest_comments(max_tweet_num_per_video):
                 # Make message for twitter.
                 tweet_msg = self._make_tweet_msg_for_comments(nico_comment.comment,
