@@ -94,7 +94,7 @@ class NicoSearch(DbManager):
     # (title, first_retrieve, url)
     TW_VIDEO_TWEET_FORMAT = '[新着動画]ニコニコ動画 - {} [{}] | {}'.decode('utf-8')
     # (title, first_retrieve, view_counter, num_res, url, mylist_counter)
-    TW_DETAIL_VIDEO_TWEET_FORMAT = '{} [投稿日:{}, 再生:{}, コメ:{}, マイリス:{}] | {}'.decode('utf-8')
+    TW_DETAIL_VIDEO_TWEET_FORMAT = '{} [投稿日:{}, 再生:{}, コメ:{}, マイリス:{}] | {} #niconico'.decode('utf-8')
     # (comment, vpos, post_datetime, title, url)
     TW_COMMENT_TWEET_FORMAT = '[コメント]{} ({})[{}] | {} {}'.decode('utf-8')
 
