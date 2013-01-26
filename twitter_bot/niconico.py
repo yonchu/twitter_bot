@@ -92,7 +92,7 @@ class NicoSearch(DbManager):
     TW_URL_LENGTH = 20
 
     # (title, first_retrieve, url)
-    TW_VIDEO_TWEET_FORMAT = 'ニコニコ動画 - {} [{}] | {}'.decode('utf-8')
+    TW_VIDEO_TWEET_FORMAT = '[新着動画]ニコニコ動画 - {} [{}] | {}'.decode('utf-8')
     # (title, first_retrieve, view_counter, num_res, url, mylist_counter)
     TW_DETAIL_VIDEO_TWEET_FORMAT = '{} [投稿日:{}, 再生:{}, コメ:{}, マイリス:{}] | {}'.decode('utf-8')
     # (comment, vpos, post_datetime, title, url)

@@ -75,7 +75,7 @@ class YoutubeSearch(object):
     API_VERSION = 'v3'
 
     # (title, published_at, url)
-    TW_TWEET_FORMAT = 'YouTube - {} [{}] | {}'
+    TW_TWEET_FORMAT = '[新着動画]YouTube - {} [{}] | {}'
 
     def __init__(self, developer_key):
         self.developer_key = developer_key
