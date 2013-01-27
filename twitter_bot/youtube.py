@@ -74,9 +74,6 @@ class YoutubeSearch(object):
     API_SERVICE_NAME = 'youtube'
     API_VERSION = 'v3'
 
-    # (title, published_at, url)
-    TW_TWEET_FORMAT = '[新着動画]YouTube - {} [{}] | {}'
-
     def __init__(self, developer_key):
         self.developer_key = developer_key
 
@@ -86,22 +83,6 @@ class YoutubeSearch(object):
         #utc_dt = datetime.fromtimestamp(time.mktime(utc_struct_time))
         #return datetime.datetime(*utc_struct_time[:6])
         return utc_str
-
-    def tweet_msgs_for_latest_videos(self, keyword, from_datetime):
-        logger.debug('Call tweet_msgs_for_latest_videos({}, {})'
-                     .format(keyword, from_datetime))
-        videos = self.search_videos(keyword, from_datetime)
-
-        # Make tweet message.
-        tweet_msgs = []
-        for video in reversed(videos):
-            str_published_at = video.published_at.strftime('%y/%m/%d %H:%M')
-            tweet_msg = YoutubeSearch.TW_TWEET_FORMAT.format(video.title,
-                                                             str_published_at,
-                                                             video.get_url())
-            tweet_msgs.append(tweet_msg)
-
-        return tweet_msgs
 
     def search_videos(self, keyword, from_datetime=None):
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)

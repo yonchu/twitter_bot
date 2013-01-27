@@ -7,7 +7,7 @@ import logging
 import os
 import unittest
 
-from twitter_bot import (Config, NicoSearch, NicoVideo, NicoComment,
+from twitter_bot import (Config, NicoVideo, NicoComment, NicoSearch,
                          JobManager, TwitterBot, TwitterBotBase,
                          TwitterVideoBot, Job, User)
 
@@ -205,24 +205,38 @@ class TwitterVideoBotTest(unittest.TestCase):
         self.prev_datetime = self.prev_datetime - datetime.timedelta(1)
 
     def test_nico_video_post(self):
+        prev_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
         bot = TwitterVideoBot(BOT_CONFIG)
         bot.is_test = True
-        bot.nico_video_post('mbaacc 馬場', self.prev_datetime)
+        bot.nico_video_post('mbaacc 馬場', prev_datetime)
 
     def test_nico_comment_post(self):
         bot = TwitterVideoBot(BOT_CONFIG)
         bot.is_test = True
-        bot.nico_comment_post('mbaacc', self.prev_datetime, self.filter_func)
+        bot.nico_comment_post('mbaacc', self.prev_datetime, filter_func=self.filter_func)
 
     def filter_func(self, video):
         if video.id in NG_ID:
             return True
         return False
 
-    def test_nico_latest_commenting_video(self):
+    def test_nico_latest_commenting_video_post(self):
         bot = TwitterVideoBot(BOT_CONFIG)
         bot.is_test = True
-        bot.nico_latest_commenting_video('作業用BGM', self.prev_datetime)
+        bot.nico_latest_commenting_video_post('作業用BGM', self.prev_datetime)
+
+    def test_nico_latest_commenting_video_post_exception(self):
+        try:
+            with NicoSearch(self.user_id, self.pass_word) as nico_search:
+                nico_search.login()
+
+                videos = nico_search.search_latest_commenting_videos('作業用BGM', self.from_datetime)
+                self.assertTrue(len(videos) > 0)
+                raise Exception('error test')
+        except:
+            return
+
+        self.fail('Do not occurs exception')
 
     def test_youtube_video_post(self):
         bot = TwitterVideoBot(BOT_CONFIG)
@@ -230,68 +244,110 @@ class TwitterVideoBotTest(unittest.TestCase):
         bot.youtube_video_post('mbaacc', self.prev_datetime)
 
 
-class NicoSearchTest(unittest.TestCase):
+from tweepy.error import TweepError
+
+
+class TwitterBotBaseTest(unittest.TestCase):
     def setUp(self):
-        config = Config(BOT_CONFIG, section='niconico')
-        self.user_id = config.get_value('user_id')
-        self.pass_word = config.get_value('pass_word')
+        #from tweepy
+        self.bot = TwitterBotBase(SAMPLE_BOT_CONFIG)
 
-        with TwitterBot(SAMPLE_BOT_CONFIG) as bot:
-            bot.create_database()
+        self.post_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+        self.str_post_datetime = self.post_datetime.strftime('%y/%m/%d %H:%M')
 
-        self.from_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    def test_tweet_msg(self):
+        self.bot.is_test = True
+        self.bot.tweet_msg('test')
 
-    def test_make_tweet_msg_for_comments(self):
-        nico_search = NicoSearch(self.user_id, self.pass_word)
-        post_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
-
-        comment = 'x' * 10
-        title = 'y' * 10
-        url = 'u' * 10
-        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
-        self.assertTrue(len(msg) < 140)
-        self.assertEquals(msg, '[コメント]xxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyy uuuuuuuuuu')
-
-        comment = 'x' * 10
-        title = 'y' * 110
-        url = 'u' * 10
-        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
-        self.assertEquals(len(msg), 140)
-        self.assertEquals(msg, '[コメント]xxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuu')
-
-        comment = 'x' * 100
-        title = 'y' * 20
-        url = 'u' * 10
-        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
-        self.assertEquals(len(msg), 140)
-        self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyy uuuuuuuuuu')
-
-        comment = 'x' * 100
-        title = 'y' * 100
-        url = 'u' * 10
-        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
-        self.assertEquals(len(msg), 140)
-        self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuu')
-
-        comment = 'x' * 100
-        title = 'y' * 100
-        url = 'u' * 20 + 'U' * 5
-        msg = nico_search._make_tweet_msg_for_comments(comment, '00:00', post_datetime, title, url)
-        self.assertEquals(len(msg), 145)
-        self.assertEquals(msg, '[コメント]xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (00:00)[13/01/01 00:00] | yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy uuuuuuuuuuuuuuuuuuuuUUUUU')
-
-    def test_tweet_msgs_for_latest_commenting_videos_exception(self):
+        self.bot.is_test = False
         try:
-            with NicoSearch(self.user_id, self.pass_word) as nico_search:
-                nico_search.login()
+            self.bot.tweet_msg('test')
+            self.fail('No error')
+        except TweepError:
+            pass
 
-                msgs = nico_search.tweet_msgs_for_latest_commenting_videos('作業用BGM', self.from_datetime)
-                self.assertTrue(len(msgs) > 0)
-                raise Exception('error test')
+    def test_tweet_msgs(self):
+        self.bot.is_test = True
+        self.bot.tweet_msg(['test1', 'test2'])
+
+        self.bot.is_test = False
+        try:
+            self.bot.tweet_msg(['test1', 'test2'])
+            self.fail('No error')
         except:
-            return
+            pass
 
-        self.fail('Do not occurs exception')
+    def test_make_tweet_msg1(self):
+        title = 'あ' * 10
+        url = 'http://' + 'u' * 10
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
+                                       self.str_post_datetime,
+                                       title=title, url=url)
+        self.assertEquals(len(msg), 62)
+        self.assertEquals(msg, '[新着動画]ニコニコ動画 - ああああああああああ [13/01/01 00:00] | ' + url)
+
+        title = 'あ' * 10
+        url = 'http://' + 'u' * 140
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
+                                       self.str_post_datetime,
+                                       title=title, url=url)
+        self.assertEquals(len(msg), 192)
+        self.assertEquals(msg, '[新着動画]ニコニコ動画 - ああああああああああ [13/01/01 00:00] | ' + url)
+
+        title = 'あ' * 140
+        url = 'http://' + 'u' * 10
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
+                                       self.str_post_datetime,
+                                       title=title, url=url)
+        self.assertEquals(len(msg), 140)
+        self.assertEquals(msg, '[新着動画]ニコニコ動画 - ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ [13/01/01 00:00] | ' + url)
+
+    def test_make_tweet_msg2(self):
+        title = 'あ' * 140
+        url = 'http://' + 'u' * 20
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
+                                       self.str_post_datetime,
+                                       1000, 2000, 3000, title=title, url=url)
+        self.assertEquals(len(msg), 147)
+        self.assertEquals(msg, 'あああああああああああああああああああああああああああああああああああああああああああああああああああああああああ [投稿日:13/01/01 00:00, 再生:1000, コメ:2000, マイリス:3000] | ' + url + ' #niconico')
+
+    def test_make_tweet_msg3(self):
+        title = 'あ' * 10
+        comment = 'ア' * 10
+        url = 'http://' + 'u' * 10
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                       self.str_post_datetime,
+                                       title=title, comment=comment, url=url)
+        self.assertEquals(len(msg), 72)
+        self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああ ' + url)
+
+        title = 'あ' * 10
+        comment = 'ア' * 10
+        url = 'http://' + 'u' * 100
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                       self.str_post_datetime,
+                                       title=title, comment=comment, url=url)
+        self.assertEquals(len(msg), 162)
+        self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああ ' + url)
+
+        title = 'あ' * 140
+        comment = 'ア' * 10
+        url = 'http://' + 'u' * 20
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                       self.str_post_datetime,
+                                       title=title, comment=comment, url=url)
+        self.assertEquals(len(msg), 147)
+        self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ ' + url)
+
+        title = 'あ' * 140
+        comment = 'ア' * 100
+        url = 'http://' + 'u' * 20
+        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                       self.str_post_datetime,
+                                       title=title, comment=comment, url=url)
+        self.assertEquals(len(msg), 146)
+        self.assertEquals(msg, '[コメント]アアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああああああああああああああああああああああああああああああああああ ' + url)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

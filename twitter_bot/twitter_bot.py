@@ -126,6 +126,9 @@ class JobManager(DbManager):
 class TwitterBotBase(object):
     CONFIG_SECTION_TWITTER_BOT = 'twitter'
 
+    TW_MAX_TWEET_LENGTH = 140
+    TW_URL_LENGTH = 20
+
     def __init__(self, bot_config):
         logger.debug('Read config file: {}'.format(bot_config))
 
@@ -149,6 +152,87 @@ class TwitterBotBase(object):
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api = tweepy.API(auth)
         self.is_test = False
+
+    def _make_tweet_msg(self, tweet_format, *args, **kwargs):
+        # Make tweet message.
+        tweet_msg = tweet_format.decode('utf-8').format(*args, **kwargs)
+        tweet_msg_len = len(tweet_msg)
+
+        # Consider URL length specifications of twitter.
+        url = None
+        if 'url' in kwargs:
+            url = kwargs['url']
+            del(kwargs['url'])
+            url_len = len(url)
+            if url_len > self.TW_URL_LENGTH:
+                tweet_msg_len -= (url_len - self.TW_URL_LENGTH)
+
+        delta_tw_max = tweet_msg_len - self.TW_MAX_TWEET_LENGTH
+        if delta_tw_max <= 0:
+            return tweet_msg
+
+        kwargs_list = kwargs.items()
+        kwargs_list.sort(key=lambda x: len(str(x[1])), reverse=True)
+
+        # Triming tweet message.
+        kwargs_list_len = len(kwargs_list)
+        if kwargs_list_len == 1:
+            key, value = kwargs_list[0]
+            value = str(value).decode('utf-8')
+            trim_len = delta_tw_max
+            value = value[:-trim_len]
+            kwargs[key] = value
+        elif kwargs_list_len >= 2:
+            key0, value0 = kwargs_list[0]
+            key1, value1 = kwargs_list[1]
+            value0 = str(value0).decode('utf-8')
+            value1 = str(value1).decode('utf-8')
+            value0_len = len(value0)
+            value1_len = len(value1)
+            delta = abs(value0_len - value1_len)
+
+            if kwargs_list_len >= 3:
+                key2, value2 = kwargs_list[2]
+                value2 = str(value2).decode('utf-8')
+                value2_len = len(value2)
+                value2_delta = value0_len - value2_len + value1_len - value2_len
+                if 0 < value2_delta < delta_tw_max:
+                    delta_tw_max = value2_delta
+
+            if value0_len > value1_len:
+                if delta_tw_max <= delta:
+                    value0 = value0[:-delta_tw_max]
+                elif delta_tw_max > delta:
+                    value0 = value0[:-delta]
+            elif value0_len < value1_len:
+                if delta_tw_max <= delta:
+                    value1 = value1[:-delta_tw_max]
+                elif delta_tw_max > delta:
+                    value1 = value1[:-delta]
+            else:
+                if delta_tw_max <= 2:
+                    trim_len = 1
+                    value0 = value0[:-trim_len]
+                    value1 = value1[:-trim_len]
+                elif kwargs_list_len >= 3 and value0_len == value2_len:
+                    trim_len = int(delta_tw_max / 3)
+                    value0 = value0[:-trim_len]
+                    value1 = value1[:-trim_len]
+                    value2 = value2[:-trim_len]
+                    kwargs[key2] = value2
+                else:
+                    trim_len = delta_tw_max / 2
+                    value0 = value0[:-trim_len]
+                    value1 = value1[:-trim_len]
+            kwargs[key0] = value0
+            kwargs[key1] = value1
+        else:
+            raise Exception('Unexpected kwargs_list={}'.format(kwargs_list))
+
+        # Restore url.
+        if url:
+            kwargs['url'] = url
+        return self._make_tweet_msg(tweet_format, *args, **kwargs)
 
     def tweet_msg(self, msg):
         logger.info('Tweet : {}'.format(msg))
@@ -375,6 +459,16 @@ class TwitterBot(TwitterBotBase, DbManager):
 
 
 class TwitterVideoBot(TwitterBotBase):
+    # (title, first_retrieve, url)
+    TW_NICO_VIDEO_TWEET_FORMAT = '[新着動画]ニコニコ動画 - {title} [{}] | {url}'
+    # (title, first_retrieve, view_counter, num_res, url, mylist_counter)
+    TW_NICO_DETAIL_VIDEO_TWEET_FORMAT = '{title} [投稿日:{}, 再生:{}, コメ:{}, マイリス:{}] | {url} #niconico'
+    # (comment, vpos, post_datetime, title, url)
+    TW_NICO_COMMENT_TWEET_FORMAT = '[コメント]{comment} ({}) [{}] | {title} {url}'
+
+    # (title, published_at, url)
+    TW_YOUTUBE_TWEET_FORMAT = '[新着動画]YouTube - {title} [{}] | {url}'
+
     def __init__(self, bot_config):
         # Init TwitterBotBase.
         TwitterBotBase.__init__(self, bot_config)
@@ -386,38 +480,88 @@ class TwitterVideoBot(TwitterBotBase):
 
     def nico_video_post(self, search_keyword, prev_datetime):
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
-            nico = NicoSearch(self.nico_user_id, self.nico_pass_word)
             nico.login()
-            tweet_msgs = nico.tweet_msgs_for_latest_videos(search_keyword,
-                                                           prev_datetime)
+            tweet_msgs = []
+            # Search latest videos by NicoNico.
+            videos = nico.search_videos(search_keyword, prev_datetime)
+            for video in reversed(videos):
+                # Make message for twitter.
+                str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
+                tweet_msg = self._make_tweet_msg(self.TW_NICO_VIDEO_TWEET_FORMAT,
+                                                 str_first_retrieve,
+                                                 title=video.title,
+                                                 url=video.get_url())
+                tweet_msgs.append(tweet_msg)
             if not tweet_msgs:
                 logger.info('nico_video_post(): No tweet messages')
             self.tweet_msgs(tweet_msgs)
 
-    def nico_comment_post(self, search_keyword, prev_datetime, filter_func=None):
+    def nico_comment_post(self, search_keyword, prev_datetime,
+                          max_comment_num=1500, max_tweet_num_per_video=3,
+                          filter_func=None):
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
-            nico = NicoSearch(self.nico_user_id, self.nico_pass_word)
+            tweet_msgs = []
             nico.login()
-            tweet_msgs = nico.tweet_msgs_for_latest_comments(search_keyword,
-                                                             prev_datetime,
-                                                             filter_func=filter_func)
+            # Search latest comments by NicoNico.
+            videos = nico.search_videos_with_comments(search_keyword,
+                                                      prev_datetime,
+                                                      max_comment_num)
+            for video in videos:
+                if filter_func and filter_func(video):
+                    continue
+                for nico_comment in video.get_latest_comments(max_tweet_num_per_video):
+                    # Make message for twitter.
+                    tweet_msg = self._make_tweet_msg(self.TW_NICO_COMMENT_TWEET_FORMAT,
+                                                     nico_comment.vpos,
+                                                     nico_comment.post_datetime,
+                                                     comment=nico_comment.comment,
+                                                     title=video.title,
+                                                     url=video.get_url())
+                    tweet_msgs.append(tweet_msg)
             if not tweet_msgs:
                 logger.info('nico_comment_post(): No tweet messages')
             self.tweet_msgs(tweet_msgs)
 
-    def nico_latest_commenting_video(self, search_keyword, prev_datetime):
+    def nico_latest_commenting_video_post(self, search_keyword, prev_datetime,
+                                          number_of_results=3, expire_days=30,
+                                          max_post_count=1):
+        tweet_msgs = []
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
             nico.login()
-            tweet_msgs = nico.tweet_msgs_for_latest_commenting_videos(search_keyword,
-                                                                      prev_datetime)
+            # Search latest commenting videos by NicoNico.
+            videos = nico.search_latest_commenting_videos(search_keyword,
+                                                          prev_datetime,
+                                                          number_of_results,
+                                                          expire_days,
+                                                          max_post_count)
+            for video in videos:
+                # Make message to tweet.
+                str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
+                tweet_msg = self._make_tweet_msg(self.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
+                                                 str_first_retrieve,
+                                                 video.view_counter,
+                                                 video.num_res,
+                                                 video.mylist_counter,
+                                                 title=video.title,
+                                                 url=video.get_url())
+                tweet_msgs.append(tweet_msg)
             if not tweet_msgs:
                 logger.info('nico_latest_commenting_video(): No tweet messages')
             self.tweet_msgs(tweet_msgs)
 
     def youtube_video_post(self, search_keyword, prev_datetime):
         youtube = YoutubeSearch(self.youtube_developer_key)
-        tweet_msgs = youtube.tweet_msgs_for_latest_videos(search_keyword,
-                                                          prev_datetime)
+        videos = youtube.search_videos(search_keyword, prev_datetime)
+
+        # Make tweet message.
+        tweet_msgs = []
+        for video in reversed(videos):
+            str_published_at = video.published_at.strftime('%y/%m/%d %H:%M')
+            tweet_msg = self._make_tweet_msg(self.TW_YOUTUBE_TWEET_FORMAT,
+                                             str_published_at,
+                                             title=video.title,
+                                             url=video.get_url())
+            tweet_msgs.append(tweet_msg)
         if not tweet_msgs:
             logger.info('youtube_video_post(): No tweet messages')
         self.tweet_msgs(tweet_msgs)

@@ -88,16 +88,6 @@ class NicoSearch(DbManager):
         '<thread_leaves thread="{thread_id}" user_id="{user_id}">0-99:10,1000</thread_leaves>' + \
         '</packet>'
 
-    TW_MAX_TWEET_LENGTH = 140
-    TW_URL_LENGTH = 20
-
-    # (title, first_retrieve, url)
-    TW_VIDEO_TWEET_FORMAT = '[新着動画]ニコニコ動画 - {} [{}] | {}'.decode('utf-8')
-    # (title, first_retrieve, view_counter, num_res, url, mylist_counter)
-    TW_DETAIL_VIDEO_TWEET_FORMAT = '{} [投稿日:{}, 再生:{}, コメ:{}, マイリス:{}] | {} #niconico'.decode('utf-8')
-    # (comment, vpos, post_datetime, title, url)
-    TW_COMMENT_TWEET_FORMAT = '[コメント]{} ({})[{}] | {} {}'.decode('utf-8')
-
     def __init__(self, user_id, pass_word, fetch_sleep_sec=1, max_retry_count=3,
                  retry_sleep_sec=15, max_fetch_fail_count=2):
         DbManager.__init__(self)
@@ -119,61 +109,6 @@ class NicoSearch(DbManager):
                         urllib.urlencode({'mail': self.user_id,
                                           'password': self.pass_word}))
         return opener
-
-    def tweet_msgs_for_latest_videos(self, keyword, from_datetime):
-        tweet_msgs = []
-        # Search latest videos by NicoNico.
-        videos = self.search_videos(keyword, from_datetime)
-        for video in reversed(videos):
-            # Make message for twitter.
-            str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
-            tweet_msg = NicoSearch.TW_VIDEO_TWEET_FORMAT \
-                                  .format(video.title, str_first_retrieve,
-                                          video.get_url())
-            tweet_msgs.append(tweet_msg)
-        return tweet_msgs
-
-    def tweet_msgs_for_latest_comments(self, keyword, from_datetime,
-                                       max_comment_num=1500,
-                                       max_tweet_num_per_video=3,
-                                       filter_func=None):
-        tweet_msgs = []
-        # Search latest comments by NicoNico.
-        videos = self.search_videos_with_comments(keyword, from_datetime,
-                                                  max_comment_num)
-        for video in videos:
-            if filter_func and filter_func(video):
-                continue
-            for nico_comment in video.get_latest_comments(max_tweet_num_per_video):
-                # Make message for twitter.
-                tweet_msg = self._make_tweet_msg_for_comments(nico_comment.comment,
-                                                              nico_comment.vpos,
-                                                              nico_comment.post_datetime,
-                                                              video.title,
-                                                              video.get_url())
-                tweet_msgs.append(tweet_msg)
-        return tweet_msgs
-
-    def tweet_msgs_for_latest_commenting_videos(self, keyword, from_datetime=None,
-                                                number_of_results=3,
-                                                expire_days=30,
-                                                max_post_count=1):
-        tweet_msgs = []
-        # Search latest commenting videos by NicoNico.
-        videos = self.search_latest_commenting_videos(keyword, from_datetime,
-                                                      number_of_results,
-                                                      expire_days,
-                                                      max_post_count)
-        for video in videos:
-            # Make message to tweet.
-            str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
-            tweet_msg = NicoSearch.TW_DETAIL_VIDEO_TWEET_FORMAT \
-                                  .format(video.title, str_first_retrieve,
-                                          video.view_counter, video.num_res,
-                                          video.mylist_counter,
-                                          video.get_url())
-            tweet_msgs.append(tweet_msg)
-        return tweet_msgs
 
     def search_videos(self, keyword, from_datetime=None, sort='f', order='d',
                       page=1, max_count=1, current_count=1, results=None):
@@ -318,46 +253,6 @@ class NicoSearch(DbManager):
                                                     max_count,
                                                     current_count,
                                                     results)
-
-    def _make_tweet_msg_for_comments(self, comment, vpos, post_datetime, title,
-                                     url):
-        str_post_datetime = post_datetime.strftime('%y/%m/%d %H:%M')
-        # Make tweet message.
-        tweet_msg = NicoSearch.TW_COMMENT_TWEET_FORMAT.format(comment, vpos,
-                                                              str_post_datetime,
-                                                              title, url)
-        tweet_msg_len = len(tweet_msg)
-        # Consider URL length specifications of twitter.
-        url_len = len(url)
-        if url_len > NicoSearch.TW_URL_LENGTH:
-            tweet_msg_len -= (url_len - NicoSearch.TW_URL_LENGTH)
-
-        delta_tw_max = tweet_msg_len - NicoSearch.TW_MAX_TWEET_LENGTH
-        if delta_tw_max <= 0:
-            return tweet_msg
-
-        comment_len = len(comment.decode('utf-8'))
-        title_len = len(title.decode('utf-8'))
-
-        # Triming tweet message.
-        delta = abs(comment_len - title_len)
-        if comment_len > title_len:
-            if delta_tw_max <= delta:
-                comment = comment[:-delta_tw_max]
-            elif delta_tw_max > delta:
-                comment = comment[:-delta]
-        elif comment_len < title_len:
-            if delta_tw_max <= delta:
-                title = title[:-delta_tw_max]
-            elif delta_tw_max > delta:
-                title = title[:-delta]
-        else:
-            trim_len = delta_tw_max / 2
-            comment = comment[:-trim_len]
-            title = title[:-trim_len]
-
-        return self._make_tweet_msg_for_comments(comment, vpos, post_datetime,
-                                                 title, url)
 
     def _fetch(self, func, *args, **kwargs):
         """Run func(*args, **kwargs) with retry."""
