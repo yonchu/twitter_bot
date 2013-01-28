@@ -333,8 +333,8 @@ class NicoSearch(object):
 
         # Message server URL.
         if not 'ms' in result or len(result['ms']) < 1:
-            logger.error('Could not get message server url: result={}'
-                         .format(result))
+            logger.error('Could not get message server url: video_id={}, result={}'
+                         .format(video_id, result))
             return None, None
         ms = result['ms'][0]
 
