@@ -482,7 +482,8 @@ class TwitterVideoBot(TwitterBotBase):
                                                            section='youtube')
 
     def nico_video_post(self, search_keyword, prev_datetime):
-        with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
+        with DbManager() as db_manager:
+            nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()
             # Search latest videos by NicoNico.
             videos = nico.search_videos(search_keyword, prev_datetime)
@@ -507,7 +508,8 @@ class TwitterVideoBot(TwitterBotBase):
     def nico_comment_post(self, search_keyword, prev_datetime,
                           max_comment_num=1500, max_tweet_num_per_video=3,
                           filter_func=None):
-        with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
+        with DbManager() as db_manager:
+            nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()
             # Search latest comments by NicoNico.
             videos = nico.search_videos_with_comments(search_keyword,
@@ -538,7 +540,8 @@ class TwitterVideoBot(TwitterBotBase):
     def nico_latest_commenting_video_post(self, search_keyword, prev_datetime,
                                           number_of_results=3, expire_days=30,
                                           max_post_count=1):
-        with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
+        with DbManager() as db_manager:
+            nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()
             # Search latest commenting videos by NicoNico.
             videos = nico.search_latest_commenting_videos(search_keyword,

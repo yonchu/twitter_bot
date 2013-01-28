@@ -18,7 +18,6 @@ import xml.dom.minidom
 
 import pprint
 
-from database import DbManager
 from models import PostVideo
 
 logger = logging.getLogger(__name__)
@@ -78,7 +77,7 @@ class NicoComment(object):
             .format(self.comment, self.vpos, self.post_datetime)
 
 
-class NicoSearch(DbManager):
+class NicoSearch(object):
     LOGIN_URL = 'https://secure.nicovideo.jp/secure/login'
     SEARCH_URL = 'http://www.nicovideo.jp/api/search/search/'
     GETFLV_URL = 'http://flapi.nicovideo.jp/api/getflv/'
@@ -88,10 +87,9 @@ class NicoSearch(DbManager):
         '<thread_leaves thread="{thread_id}" user_id="{user_id}">0-99:10,1000</thread_leaves>' + \
         '</packet>'
 
-    def __init__(self, user_id, pass_word, fetch_sleep_sec=1, max_retry_count=3,
+    def __init__(self, db_manager, user_id, pass_word, fetch_sleep_sec=1, max_retry_count=3,
                  retry_sleep_sec=15, max_fetch_fail_count=2):
-        DbManager.__init__(self)
-
+        self.db_manager = db_manager
         self.user_id = user_id
         self.pass_word = pass_word
         self.fetch_sleep_sec = fetch_sleep_sec
@@ -213,7 +211,7 @@ class NicoSearch(DbManager):
         videos = self.search_videos(keyword, sort='n', page=current_count)
         for video in videos:
             # Check if the video is already posted.
-            old_post_video = self.db_session.query(PostVideo) \
+            old_post_video = self.db_manager.db_session.query(PostVideo) \
                 .filter(sqlalchemy
                         .and_(PostVideo.video_id == video.id)).first()
 
@@ -239,7 +237,7 @@ class NicoSearch(DbManager):
                 # Add new post_video to database when not registerd
                 post_video = PostVideo(video.id)
                 logger.info('Add new post_video to database : post_video={}'.format(post_video))
-                self.db_session.add(post_video)
+                self.db_manager.db_session.add(post_video)
 
             results.append(video)
             if len(results) >= number_of_results:
