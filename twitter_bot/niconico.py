@@ -111,17 +111,13 @@ class NicoSearch(object):
     def search_videos(self, keyword, from_datetime=None, sort='f', order='d',
                       page=1, max_count=1, current_count=1, results=None):
         results = results or []
-
         # Limit the number of fetching.
         if current_count > max_count:
             return results
-
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
 
         # Fetch videos from NicoNico.
-        json_videos = self._fetch(self._fetch_videos, keyword, sort, order,
-                                  page)
-
+        json_videos = self._fetch(self._fetch_videos, keyword, sort, order, page)
         for json_video in json_videos:
             video = NicoVideo(**json_video)
             if video.first_retrieve < from_datetime:

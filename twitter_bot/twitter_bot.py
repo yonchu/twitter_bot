@@ -486,17 +486,37 @@ class TwitterVideoBot(TwitterBotBase):
                                                            section='youtube')
 
     def nico_video_post(self, search_keyword, prev_datetime):
+        now_date = datetime.datetime.now()
+        if now_date - prev_datetime < datetime.timedelta(1):
+            old_prev_datetime = prev_datetime
+            prev_datetime = prev_datetime - datetime.timedelta(hours=2)
+            logger.debug('Change prev_datetime: {} -> {}'
+                         .format(old_prev_datetime, prev_datetime))
+
         with DbManager() as db_manager:
             nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()
             # Search latest videos by NicoNico.
             videos = nico.search_videos(search_keyword, prev_datetime)
-            if not videos:
-                logger.info('nico_video_post(): No tweet messages')
-                return
+
             tweet_count = 0
             failed_list = []
             for video in reversed(videos):
+                # Check if the video is already posted.
+                old_post_video = db_manager.db_session.query(PostVideo) \
+                    .filter(sqlalchemy
+                            .and_(PostVideo.video_id == video.id)).first()
+
+                if old_post_video:
+                    logger.debug('Skip posted video: video={}'.format(video))
+                    continue
+
+                # Add new post_video to database when not registerd
+                post_video = PostVideo(video.id)
+                logger.info('Add new post_video to database : post_video={}'
+                            .format(post_video))
+                db_manager.db_session.add(post_video)
+
                 # Make message for twitter.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
                 msg = self._make_tweet_msg(self.TW_NICO_VIDEO_TWEET_FORMAT,
@@ -504,9 +524,11 @@ class TwitterVideoBot(TwitterBotBase):
                                            title=video.title,
                                            url=video.get_url())
                 try:
-                    self.msg(msg, is_sleep=True)
+                    self.tweet_msg(msg, is_sleep=True)
                     tweet_count += 1
+                    db_manager.db_session.commit()
                 except Exception as e:
+                    db_manager.db_session.rollback()
                     logger.exception('Tweet failed msg={}'.format(msg))
                     failed_list.append((e, msg))
 
@@ -526,9 +548,6 @@ class TwitterVideoBot(TwitterBotBase):
             videos = nico.search_videos_with_comments(search_keyword,
                                                       prev_datetime,
                                                       max_comment_num)
-            if not videos:
-                logger.info('nico_comment_post(): No tweet messages')
-                return
             tweet_count = 0
             failed_list = []
             for video in videos:
