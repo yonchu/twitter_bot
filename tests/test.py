@@ -9,7 +9,7 @@ import unittest
 
 from twitter_bot import (Config, NicoVideo, NicoComment, NicoSearch,
                          JobManager, TwitterBot, TwitterBotBase,
-                         TwitterVideoBot, Job, User)
+                         DbManager, TwitterVideoBot, Job, User)
 
 SAMPLE_BOT_CONFIG = 'samples/bot.cfg.sample'
 BOT_CONFIG = 'samples/bot.cfg'
@@ -59,7 +59,7 @@ class ModelsTest(unittest.TestCase):
 class SampleBot(TwitterBotBase):
     def __init__(self, bot_config):
         # Init TwitterBotBase.
-        TwitterBotBase.__init__(self, bot_config)
+        TwitterBotBase.__init__(self, bot_config, sleep_time_sec=1)
         self.post1_args = None
         self.post1_kwargs = None
 
@@ -198,6 +198,10 @@ NG_ID = ['sm16284937', 'sm19370827', 'sm14276357', 'sm16577879', 'sm16570187', '
 
 class TwitterVideoBotTest(unittest.TestCase):
     def setUp(self):
+        config = Config(BOT_CONFIG, section='niconico')
+        self.user_id = config.get_value('user_id')
+        self.pass_word = config.get_value('pass_word')
+
         with TwitterBot(BOT_CONFIG) as bot:
             bot.create_database()
 
@@ -205,7 +209,7 @@ class TwitterVideoBotTest(unittest.TestCase):
         self.prev_datetime = self.prev_datetime - datetime.timedelta(1)
 
     def test_nico_video_post(self):
-        prev_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+        prev_datetime = datetime.datetime.strptime('2013-01-25 00:00:00', '%Y-%m-%d %H:%M:%S')
         bot = TwitterVideoBot(BOT_CONFIG)
         bot.is_test = True
         bot.nico_video_post('mbaacc 馬場', prev_datetime)
@@ -226,15 +230,17 @@ class TwitterVideoBotTest(unittest.TestCase):
         bot.nico_latest_commenting_video_post('作業用BGM', self.prev_datetime)
 
     def test_nico_latest_commenting_video_post_exception(self):
-        try:
-            with NicoSearch(self.user_id, self.pass_word) as nico_search:
-                nico_search.login()
+        with DbManager() as db_manager:
+            nico_search = NicoSearch(db_manager, self.user_id, self.pass_word)
+            nico_search.login()
 
+            try:
                 videos = nico_search.search_latest_commenting_videos('作業用BGM', self.from_datetime)
                 self.assertTrue(len(videos) > 0)
                 raise Exception('error test')
-        except:
-            return
+            except Exception as e:
+                if e.message == 'error test':
+                    return
 
         self.fail('Do not occurs exception')
 
@@ -250,7 +256,7 @@ from tweepy.error import TweepError
 class TwitterBotBaseTest(unittest.TestCase):
     def setUp(self):
         #from tweepy
-        self.bot = TwitterBotBase(SAMPLE_BOT_CONFIG)
+        self.bot = TwitterBotBase(SAMPLE_BOT_CONFIG, sleep_time_sec=1)
 
         self.post_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
         self.str_post_datetime = self.post_datetime.strftime('%y/%m/%d %H:%M')
