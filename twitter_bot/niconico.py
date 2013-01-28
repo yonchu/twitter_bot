@@ -203,7 +203,7 @@ class NicoSearch(object):
 
         if current_count > max_count:
             logger.error('Recursive count over: count='.format(current_count))
-            return results
+            return
 
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
 
@@ -240,17 +240,18 @@ class NicoSearch(object):
                 self.db_manager.db_session.add(post_video)
 
             results.append(video)
+            yield video
             if len(results) >= number_of_results:
-                return results
+                return
 
         current_count += 1
-        return self.search_latest_commenting_videos(keyword, from_datetime,
-                                                    number_of_results,
-                                                    expire_days,
-                                                    max_post_count,
-                                                    max_count,
-                                                    current_count,
-                                                    results)
+        it = self.search_latest_commenting_videos(keyword, from_datetime,
+                                                  number_of_results,
+                                                  expire_days, max_post_count,
+                                                  max_count, current_count,
+                                                  results)
+        for result in it:
+            yield result
 
     def _fetch(self, func, *args, **kwargs):
         """Run func(*args, **kwargs) with retry."""

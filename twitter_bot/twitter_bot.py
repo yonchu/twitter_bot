@@ -236,17 +236,12 @@ class TwitterBotBase(object):
             kwargs['url'] = url
         return self._make_tweet_msg(tweet_format, *args, **kwargs)
 
-    def tweet_msg(self, msg, is_sleep=False, failed_list=None):
+    def tweet_msg(self, msg, is_sleep=False):
         logger.info('Tweet : {}'.format(msg))
         if self.is_test:
             return
         try:
             self.api.update_status(msg)
-        except Exception as e:
-            if failed_list is None:
-                raise
-            logger.exception('Tweet failed msg={}'.format(msg))
-            failed_list.append((e, msg))
         finally:
             if is_sleep:
                 time.sleep(self.sleep_time_sec)
@@ -256,9 +251,18 @@ class TwitterBotBase(object):
             logger.debug('No tweet messages')
             return
         # [(Exception, tweet), ]
+        tweet_count = 0
         failed_list = []
         for msg in msgs:
-            self.tweet_msg(msg, is_sleep=True, failed_list=failed_list)
+            try:
+                self.tweet_msg(msg, is_sleep=True)
+                tweet_count += 1
+            except Exception as e:
+                logger.exception('Tweet failed msg={}'.format(msg))
+                failed_list.append((e, msg))
+
+        logger.info('nico_latest_commenting_video(): {} tweet'
+                    .format(tweet_count))
         if failed_list:
             raise Exception('Tweet faild {}'
                             .format(prettyprint.pp_str(failed_list)))
@@ -490,17 +494,24 @@ class TwitterVideoBot(TwitterBotBase):
             if not videos:
                 logger.info('nico_video_post(): No tweet messages')
                 return
+            tweet_count = 0
             failed_list = []
             for video in reversed(videos):
                 # Make message for twitter.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
-                tweet_msg = self._make_tweet_msg(self.TW_NICO_VIDEO_TWEET_FORMAT,
-                                                 str_first_retrieve,
-                                                 title=video.title,
-                                                 url=video.get_url())
-                self.tweet_msg(tweet_msg, is_sleep=True,
-                               failed_list=failed_list)
+                msg = self._make_tweet_msg(self.TW_NICO_VIDEO_TWEET_FORMAT,
+                                           str_first_retrieve,
+                                           title=video.title,
+                                           url=video.get_url())
+                try:
+                    self.msg(msg, is_sleep=True)
+                    tweet_count += 1
+                except Exception as e:
+                    logger.exception('Tweet failed msg={}'.format(msg))
+                    failed_list.append((e, msg))
 
+            logger.info('nico_latest_commenting_video(): {} tweet'
+                        .format(tweet_count))
             if failed_list:
                 raise Exception('Tweet faild {}'
                                 .format(prettyprint.pp_str(failed_list)))
@@ -518,21 +529,28 @@ class TwitterVideoBot(TwitterBotBase):
             if not videos:
                 logger.info('nico_comment_post(): No tweet messages')
                 return
+            tweet_count = 0
             failed_list = []
             for video in videos:
                 if filter_func and filter_func(video):
                     continue
                 for nico_comment in video.get_latest_comments(max_tweet_num_per_video):
                     # Make message for twitter.
-                    tweet_msg = self._make_tweet_msg(self.TW_NICO_COMMENT_TWEET_FORMAT,
-                                                     nico_comment.vpos,
-                                                     nico_comment.post_datetime,
-                                                     comment=nico_comment.comment,
-                                                     title=video.title,
-                                                     url=video.get_url())
-                    self.tweet_msg(tweet_msg, is_sleep=True,
-                                   failed_list=failed_list)
+                    msg = self._make_tweet_msg(self.TW_NICO_COMMENT_TWEET_FORMAT,
+                                               nico_comment.vpos,
+                                               nico_comment.post_datetime,
+                                               comment=nico_comment.comment,
+                                               title=video.title,
+                                               url=video.get_url())
+                    try:
+                        self.tweet_msg(msg, is_sleep=True)
+                        tweet_count += 1
+                    except Exception as e:
+                        logger.exception('Tweet failed msg={}'.format(msg))
+                        failed_list.append((e, msg))
 
+            logger.info('nico_latest_commenting_video(): {} tweet'
+                        .format(tweet_count))
             if failed_list:
                 raise Exception('Tweet faild {}'
                                 .format(prettyprint.pp_str(failed_list)))
@@ -544,28 +562,34 @@ class TwitterVideoBot(TwitterBotBase):
             nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()
             # Search latest commenting videos by NicoNico.
-            videos = nico.search_latest_commenting_videos(search_keyword,
-                                                          prev_datetime,
-                                                          number_of_results,
-                                                          expire_days,
-                                                          max_post_count)
-            if not videos:
-                logger.info('nico_latest_commenting_video(): No tweet messages')
-                return
+            it = nico.search_latest_commenting_videos(search_keyword,
+                                                      prev_datetime,
+                                                      number_of_results,
+                                                      expire_days,
+                                                      max_post_count)
+            tweet_count = 0
             failed_list = []
-            for video in videos:
+            for video in it:
                 # Make message to tweet.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
-                tweet_msg = self._make_tweet_msg(self.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
-                                                 str_first_retrieve,
-                                                 video.view_counter,
-                                                 video.num_res,
-                                                 video.mylist_counter,
-                                                 title=video.title,
-                                                 url=video.get_url())
-                self.tweet_msg(tweet_msg, is_sleep=True,
-                               failed_list=failed_list)
+                msg = self._make_tweet_msg(self.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
+                                           str_first_retrieve,
+                                           video.view_counter,
+                                           video.num_res,
+                                           video.mylist_counter,
+                                           title=video.title,
+                                           url=video.get_url())
+                try:
+                    self.tweet_msg(msg, is_sleep=True)
+                    tweet_count += 1
+                    db_manager.db_session.commit()
+                except Exception as e:
+                    db_manager.db_session.rollback()
+                    logger.exception('Tweet failed msg={}'.format(msg))
+                    failed_list.append((e, msg))
 
+            logger.info('nico_latest_commenting_video(): {} tweet'
+                        .format(tweet_count))
             if failed_list:
                 raise Exception('Tweet faild {}'
                                 .format(prettyprint.pp_str(failed_list)))
