@@ -486,12 +486,15 @@ class TwitterVideoBot(TwitterBotBase):
                                                            section='youtube')
 
     def nico_video_post(self, search_keyword, prev_datetime):
-        now_date = datetime.datetime.now()
-        if now_date - prev_datetime < datetime.timedelta(1):
-            old_prev_datetime = prev_datetime
-            prev_datetime = prev_datetime - datetime.timedelta(hours=2)
-            logger.debug('Change prev_datetime: {} -> {}'
-                         .format(old_prev_datetime, prev_datetime))
+        logger.debug('Call nico_video_post({}, {})'
+                     .format(search_keyword, prev_datetime))
+        if prev_datetime:
+            now_date = datetime.datetime.now()
+            if now_date - prev_datetime < datetime.timedelta(1):
+                old_prev_datetime = prev_datetime
+                prev_datetime = prev_datetime - datetime.timedelta(hours=2)
+                logger.debug('Change prev_datetime: {} -> {}'
+                             .format(old_prev_datetime, prev_datetime))
 
         with DbManager() as db_manager:
             nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
@@ -541,6 +544,9 @@ class TwitterVideoBot(TwitterBotBase):
     def nico_comment_post(self, search_keyword, prev_datetime,
                           max_comment_num=1500, max_tweet_num_per_video=3,
                           filter_func=None):
+        logger.debug('Call nico_comment_post({}, {}, {}, {}, {})'
+                     .format(search_keyword, prev_datetime, max_comment_num,
+                             max_tweet_num_per_video, filter_func))
         with DbManager() as db_manager:
             nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()
@@ -577,6 +583,9 @@ class TwitterVideoBot(TwitterBotBase):
     def nico_latest_commenting_video_post(self, search_keyword, prev_datetime,
                                           number_of_results=3, expire_days=30,
                                           max_post_count=1):
+        logger.debug('Call nico_latest_commenting_video_post({}, {}, {}, {}, {})'
+                     .format(search_keyword, prev_datetime, number_of_results,
+                             expire_days, max_post_count))
         with DbManager() as db_manager:
             nico = NicoSearch(db_manager, self.nico_user_id, self.nico_pass_word)
             nico.login()

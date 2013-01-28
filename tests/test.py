@@ -235,8 +235,7 @@ class TwitterVideoBotTest(unittest.TestCase):
             nico_search.login()
 
             try:
-                videos = nico_search.search_latest_commenting_videos('作業用BGM', self.from_datetime)
-                self.assertTrue(len(videos) > 0)
+                nico_search.search_latest_commenting_videos('作業用BGM', self.prev_datetime)
                 raise Exception('error test')
             except Exception as e:
                 if e.message == 'error test':
