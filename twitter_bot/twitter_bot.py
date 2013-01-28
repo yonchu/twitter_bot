@@ -129,7 +129,9 @@ class TwitterBotBase(object):
     TW_MAX_TWEET_LENGTH = 140
     TW_URL_LENGTH = 20
 
-    def __init__(self, bot_config):
+    def __init__(self, bot_config, sleep_time_sec):
+        self.sleep_time_sec = sleep_time_sec
+
         logger.debug('Read config file: {}'.format(bot_config))
 
         # Read twitter_bot config.
@@ -234,39 +236,40 @@ class TwitterBotBase(object):
             kwargs['url'] = url
         return self._make_tweet_msg(tweet_format, *args, **kwargs)
 
-    def tweet_msg(self, msg):
+    def tweet_msg(self, msg, is_sleep=False, failed_list=None):
         logger.info('Tweet : {}'.format(msg))
-        if not self.is_test:
+        if self.is_test:
+            return
+        try:
             self.api.update_status(msg)
+        except Exception as e:
+            if failed_list is None:
+                raise
+            logger.exception('Tweet failed msg={}'.format(msg))
+            failed_list.append((e, msg))
+        finally:
+            if is_sleep:
+                time.sleep(self.sleep_time_sec)
 
-    def tweet_msgs(self, msgs, sleep_time_sec=1):
+    def tweet_msgs(self, msgs):
         if not msgs:
             logger.debug('No tweet messages')
             return
         # [(Exception, tweet), ]
-        failed_tweet = []
+        failed_list = []
         for msg in msgs:
-            try:
-                self.tweet_msg(msg)
-            except Exception as e:
-                logger.exception('Tweet failed msg={}'.format(msg))
-                failed_tweet.append((e, msg))
-            finally:
-                time.sleep(sleep_time_sec)
-
-        if failed_tweet:
-            #fail_msg = '\n'.join('{}: {}'.format(e, m) for e, m in failed_tweet)
-            #raise Exception('Tweet faild\n{}'.format(fail_msg))
+            self.tweet_msg(msg, is_sleep=True, failed_list=failed_list)
+        if failed_list:
             raise Exception('Tweet faild {}'
-                            .format(prettyprint.pp_str(failed_tweet)))
+                            .format(prettyprint.pp_str(failed_list)))
 
 
 class TwitterBot(TwitterBotBase, DbManager):
     FOLLOW_MARGIN = 100
 
-    def __init__(self, bot_config):
+    def __init__(self, bot_config, sleep_time_sec=1):
         # Init TwitterBotBase.
-        TwitterBotBase.__init__(self, bot_config)
+        TwitterBotBase.__init__(self, bot_config, sleep_time_sec)
 
         # Init DbManager.
         DbManager.__init__(self)
@@ -469,9 +472,9 @@ class TwitterVideoBot(TwitterBotBase):
     # (title, published_at, url)
     TW_YOUTUBE_TWEET_FORMAT = '[新着動画]YouTube - {title} [{}] | {url}'
 
-    def __init__(self, bot_config):
+    def __init__(self, bot_config, sleep_time_sec=1):
         # Init TwitterBotBase.
-        TwitterBotBase.__init__(self, bot_config)
+        TwitterBotBase.__init__(self, bot_config, sleep_time_sec)
 
         self.nico_user_id = self.config.get_value('user_id', section='niconico')
         self.nico_pass_word = self.config.get_value('pass_word', section='niconico')
@@ -481,9 +484,12 @@ class TwitterVideoBot(TwitterBotBase):
     def nico_video_post(self, search_keyword, prev_datetime):
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
             nico.login()
-            tweet_msgs = []
             # Search latest videos by NicoNico.
             videos = nico.search_videos(search_keyword, prev_datetime)
+            if not videos:
+                logger.info('nico_video_post(): No tweet messages')
+                return
+            failed_list = []
             for video in reversed(videos):
                 # Make message for twitter.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
@@ -491,21 +497,26 @@ class TwitterVideoBot(TwitterBotBase):
                                                  str_first_retrieve,
                                                  title=video.title,
                                                  url=video.get_url())
-                tweet_msgs.append(tweet_msg)
-            if not tweet_msgs:
-                logger.info('nico_video_post(): No tweet messages')
-            self.tweet_msgs(tweet_msgs)
+                self.tweet_msg(tweet_msg, is_sleep=True,
+                               failed_list=failed_list)
+
+            if failed_list:
+                raise Exception('Tweet faild {}'
+                                .format(prettyprint.pp_str(failed_list)))
 
     def nico_comment_post(self, search_keyword, prev_datetime,
                           max_comment_num=1500, max_tweet_num_per_video=3,
                           filter_func=None):
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
-            tweet_msgs = []
             nico.login()
             # Search latest comments by NicoNico.
             videos = nico.search_videos_with_comments(search_keyword,
                                                       prev_datetime,
                                                       max_comment_num)
+            if not videos:
+                logger.info('nico_comment_post(): No tweet messages')
+                return
+            failed_list = []
             for video in videos:
                 if filter_func and filter_func(video):
                     continue
@@ -517,15 +528,16 @@ class TwitterVideoBot(TwitterBotBase):
                                                      comment=nico_comment.comment,
                                                      title=video.title,
                                                      url=video.get_url())
-                    tweet_msgs.append(tweet_msg)
-            if not tweet_msgs:
-                logger.info('nico_comment_post(): No tweet messages')
-            self.tweet_msgs(tweet_msgs)
+                    self.tweet_msg(tweet_msg, is_sleep=True,
+                                   failed_list=failed_list)
+
+            if failed_list:
+                raise Exception('Tweet faild {}'
+                                .format(prettyprint.pp_str(failed_list)))
 
     def nico_latest_commenting_video_post(self, search_keyword, prev_datetime,
                                           number_of_results=3, expire_days=30,
                                           max_post_count=1):
-        tweet_msgs = []
         with NicoSearch(self.nico_user_id, self.nico_pass_word) as nico:
             nico.login()
             # Search latest commenting videos by NicoNico.
@@ -534,6 +546,10 @@ class TwitterVideoBot(TwitterBotBase):
                                                           number_of_results,
                                                           expire_days,
                                                           max_post_count)
+            if not videos:
+                logger.info('nico_latest_commenting_video(): No tweet messages')
+                return
+            failed_list = []
             for video in videos:
                 # Make message to tweet.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
@@ -544,24 +560,24 @@ class TwitterVideoBot(TwitterBotBase):
                                                  video.mylist_counter,
                                                  title=video.title,
                                                  url=video.get_url())
-                tweet_msgs.append(tweet_msg)
-            if not tweet_msgs:
-                logger.info('nico_latest_commenting_video(): No tweet messages')
-            self.tweet_msgs(tweet_msgs)
+                self.tweet_msg(tweet_msg, is_sleep=True,
+                               failed_list=failed_list)
+
+            if failed_list:
+                raise Exception('Tweet faild {}'
+                                .format(prettyprint.pp_str(failed_list)))
 
     def youtube_video_post(self, search_keyword, prev_datetime):
         youtube = YoutubeSearch(self.youtube_developer_key)
         videos = youtube.search_videos(search_keyword, prev_datetime)
-
+        if not videos:
+            logger.info('youtube_video_post(): No tweet messages')
+            return
         # Make tweet message.
-        tweet_msgs = []
         for video in reversed(videos):
             str_published_at = video.published_at.strftime('%y/%m/%d %H:%M')
             tweet_msg = self._make_tweet_msg(self.TW_YOUTUBE_TWEET_FORMAT,
                                              str_published_at,
                                              title=video.title,
                                              url=video.get_url())
-            tweet_msgs.append(tweet_msg)
-        if not tweet_msgs:
-            logger.info('youtube_video_post(): No tweet messages')
-        self.tweet_msgs(tweet_msgs)
+            self.tweet_msg(tweet_msg)
