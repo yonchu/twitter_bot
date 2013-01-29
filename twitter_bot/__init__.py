@@ -14,4 +14,6 @@ from database import DbManager
 
 from models import Job, User
 
-from twitter_bot import JobManager, TwitterBotBase, TwitterBot, TwitterVideoBot
+from job import JobManager
+
+from twitter_bot import TwitterBotBase, TwitterBot, TwitterVideoBot
