@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from apiclient.discovery import build
-import calendar
 import datetime
 import logging
-import time
+
+import utils
 
 logger = logging.getLogger(__name__)
 
@@ -34,16 +34,6 @@ class YoutubeVideo(object):
                                                   self.utc_published_at,
                                                   self.published_at)
 
-    @classmethod
-    def _utc_str2jst_datetime(cls, utc_str):
-        if not utc_str.endswith('Z'):
-            raise ValueError('Unknown format: {}'.format(utc_str))
-        utc_str = utc_str[:-5]
-        utc_time = time.strptime(utc_str, '%Y-%m-%dT%H:%M:%S')
-        jst_time = time.localtime(calendar.timegm(utc_time))
-        jst_datetime = datetime.datetime(*jst_time[:6])
-        return jst_datetime
-
     def get_url(self):
         return YoutubeVideo.VIDEO_URL + self.video_id
 
@@ -56,7 +46,8 @@ class YoutubeVideo(object):
         thumbnails = response['snippet']['thumbnails']
 
         utc_published_at = response['snippet']['publishedAt']
-        published_at = cls._utc_str2jst_datetime(utc_published_at)
+        published_at = utils.utc_str2local_datetime(utc_published_at,
+                                                    '%Y-%m-%dT%H:%M:%S.000Z')
 
         yv = YoutubeVideo(video_id, channel_id, description, published_at,
                           thumbnails, title)
@@ -77,13 +68,6 @@ class YoutubeSearch(object):
     def __init__(self, developer_key):
         self.developer_key = developer_key
 
-    def _jst_datetime2utc_str(self, jst_datetime):
-        utc_struct_time = time.gmtime(time.mktime(jst_datetime.timetuple()))
-        utc_str = time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_struct_time)
-        #utc_dt = datetime.fromtimestamp(time.mktime(utc_struct_time))
-        #return datetime.datetime(*utc_struct_time[:6])
-        return utc_str
-
     def search_videos(self, keyword, from_datetime=None):
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
         logger.debug('Call search_videos({}, {})'.format(keyword, from_datetime))
@@ -100,7 +84,7 @@ class YoutubeSearch(object):
                 maxResults=32,
                 type='video',
                 order='date',
-                publishedAfter=self._jst_datetime2utc_str(from_datetime),
+                publishedAfter=utils.local_datetime2utc_str(from_datetime),
             ).execute()
 
             for video in search_response.get('items', []):

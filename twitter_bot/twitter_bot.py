@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import calendar
 import datetime
 import logging
 import sqlalchemy
@@ -10,6 +9,7 @@ import time
 import tweepy
 
 import prettyprint
+import utils
 from config import Config
 from database import DbManager
 from models import Job, User, PostVideo
@@ -21,9 +21,6 @@ logger = logging.getLogger(__name__)
 
 class TwitterBotBase(object):
     CONFIG_SECTION_TWITTER_BOT = 'twitter'
-
-    TW_MAX_TWEET_LENGTH = 140
-    TW_URL_LENGTH = 20
 
     def __init__(self, bot_config, sleep_time_sec):
         self.sleep_time_sec = sleep_time_sec
@@ -50,87 +47,6 @@ class TwitterBotBase(object):
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api = tweepy.API(auth)
         self.is_test = False
-
-    def _make_tweet_msg(self, tweet_format, *args, **kwargs):
-        # Make tweet message.
-        tweet_msg = tweet_format.decode('utf-8').format(*args, **kwargs)
-        tweet_msg_len = len(tweet_msg)
-
-        # Consider URL length specifications of twitter.
-        url = None
-        if 'url' in kwargs:
-            url = kwargs['url']
-            del(kwargs['url'])
-            url_len = len(url)
-            if url_len > self.TW_URL_LENGTH:
-                tweet_msg_len -= (url_len - self.TW_URL_LENGTH)
-
-        delta_tw_max = tweet_msg_len - self.TW_MAX_TWEET_LENGTH
-        if delta_tw_max <= 0:
-            return tweet_msg
-
-        kwargs_list = kwargs.items()
-        kwargs_list.sort(key=lambda x: len(str(x[1])), reverse=True)
-
-        # Triming tweet message.
-        kwargs_list_len = len(kwargs_list)
-        if kwargs_list_len == 1:
-            key, value = kwargs_list[0]
-            value = str(value).decode('utf-8')
-            trim_len = delta_tw_max
-            value = value[:-trim_len]
-            kwargs[key] = value
-        elif kwargs_list_len >= 2:
-            key0, value0 = kwargs_list[0]
-            key1, value1 = kwargs_list[1]
-            value0 = str(value0).decode('utf-8')
-            value1 = str(value1).decode('utf-8')
-            value0_len = len(value0)
-            value1_len = len(value1)
-            delta = abs(value0_len - value1_len)
-
-            if kwargs_list_len >= 3:
-                key2, value2 = kwargs_list[2]
-                value2 = str(value2).decode('utf-8')
-                value2_len = len(value2)
-                value2_delta = value0_len - value2_len + value1_len - value2_len
-                if 0 < value2_delta < delta_tw_max:
-                    delta_tw_max = value2_delta
-
-            if value0_len > value1_len:
-                if delta_tw_max <= delta:
-                    value0 = value0[:-delta_tw_max]
-                elif delta_tw_max > delta:
-                    value0 = value0[:-delta]
-            elif value0_len < value1_len:
-                if delta_tw_max <= delta:
-                    value1 = value1[:-delta_tw_max]
-                elif delta_tw_max > delta:
-                    value1 = value1[:-delta]
-            else:
-                if delta_tw_max <= 2:
-                    trim_len = 1
-                    value0 = value0[:-trim_len]
-                    value1 = value1[:-trim_len]
-                elif kwargs_list_len >= 3 and value0_len == value2_len:
-                    trim_len = int(delta_tw_max / 3)
-                    value0 = value0[:-trim_len]
-                    value1 = value1[:-trim_len]
-                    value2 = value2[:-trim_len]
-                    kwargs[key2] = value2
-                else:
-                    trim_len = delta_tw_max / 2
-                    value0 = value0[:-trim_len]
-                    value1 = value1[:-trim_len]
-            kwargs[key0] = value0
-            kwargs[key1] = value1
-        else:
-            raise Exception('Unexpected kwargs_list={}'.format(kwargs_list))
-
-        # Restore url.
-        if url:
-            kwargs['url'] = url
-        return self._make_tweet_msg(tweet_format, *args, **kwargs)
 
     def tweet_msg(self, msg, is_sleep=False):
         logger.info('Tweet : {}'.format(msg))
@@ -173,12 +89,6 @@ class TwitterBot(TwitterBotBase, DbManager):
 
         # Init DbManager.
         DbManager.__init__(self)
-
-    def _utc2datetime(self, utc_str):
-        utc_time = time.strptime(utc_str, '%a %b %d %H:%M:%S +0000 %Y')
-        jst_time = time.localtime(calendar.timegm(utc_time))
-        jst_datetime = datetime.datetime(*jst_time[:6])
-        return jst_datetime
 
     def _get_follower_ids(self, user_id=None):
         """Get all followers id list of a specified user."""
@@ -281,7 +191,7 @@ class TwitterBot(TwitterBotBase, DbManager):
         """Retweet mentions."""
         statuses = self.api.mentions()
         for status in statuses:
-            created_at = self._utc2datetime(status.created_at)
+            created_at = utils.utc_str2local_datetime(status.created_at)
             if created_at < since:
                 continue
             try:
@@ -296,7 +206,7 @@ class TwitterBot(TwitterBotBase, DbManager):
         for status in statuses:
             if status.user.lang != 'ja':
                 continue
-            created_at = self._utc2datetime(status.created_at)
+            created_at = utils.utc_str2local_datetime(status.created_at)
             if created_at < since:
                 continue
             try:
@@ -418,7 +328,7 @@ class TwitterVideoBot(TwitterBotBase):
 
                 # Make message for twitter.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
-                msg = self._make_tweet_msg(self.TW_NICO_VIDEO_TWEET_FORMAT,
+                msg = utils.make_tweet_msg(self.TW_NICO_VIDEO_TWEET_FORMAT,
                                            str_first_retrieve,
                                            title=video.title,
                                            url=video.get_url())
@@ -457,7 +367,7 @@ class TwitterVideoBot(TwitterBotBase):
                     continue
                 for nico_comment in video.get_latest_comments(max_tweet_num_per_video):
                     # Make message for twitter.
-                    msg = self._make_tweet_msg(self.TW_NICO_COMMENT_TWEET_FORMAT,
+                    msg = utils.make_tweet_msg(self.TW_NICO_COMMENT_TWEET_FORMAT,
                                                nico_comment.vpos,
                                                nico_comment.post_datetime,
                                                comment=nico_comment.comment,
@@ -496,7 +406,7 @@ class TwitterVideoBot(TwitterBotBase):
             for video in it:
                 # Make message to tweet.
                 str_first_retrieve = video.first_retrieve.strftime('%y/%m/%d %H:%M')
-                msg = self._make_tweet_msg(self.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
+                msg = utils.make_tweet_msg(self.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
                                            str_first_retrieve,
                                            video.view_counter,
                                            video.num_res,
@@ -527,7 +437,7 @@ class TwitterVideoBot(TwitterBotBase):
         # Make tweet message.
         for video in reversed(videos):
             str_published_at = video.published_at.strftime('%y/%m/%d %H:%M')
-            tweet_msg = self._make_tweet_msg(self.TW_YOUTUBE_TWEET_FORMAT,
+            tweet_msg = utils.make_tweet_msg(self.TW_YOUTUBE_TWEET_FORMAT,
                                              str_published_at,
                                              title=video.title,
                                              url=video.get_url())
