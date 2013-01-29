@@ -9,7 +9,7 @@ import unittest
 
 from twitter_bot import (Config, NicoVideo, NicoComment, NicoSearch,
                          JobManager, TwitterBot, TwitterBotBase,
-                         DbManager, TwitterVideoBot, Job, User)
+                         DbManager, TwitterVideoBot, Job, User, utils)
 
 SAMPLE_BOT_CONFIG = 'samples/bot.cfg.sample'
 BOT_CONFIG = 'samples/bot.cfg'
@@ -282,37 +282,43 @@ class TwitterBotBaseTest(unittest.TestCase):
         except:
             pass
 
+
+class UtilTest(unittest.TestCase):
+    def setUp(self):
+        self.post_datetime = datetime.datetime.strptime('2013-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+        self.str_post_datetime = self.post_datetime.strftime('%y/%m/%d %H:%M')
+
     def test_make_tweet_msg1(self):
         title = 'あ' * 10
         url = 'http://' + 'u' * 10
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
-                                       self.str_post_datetime,
-                                       title=title, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
+                                   self.str_post_datetime,
+                                   title=title, url=url)
         self.assertEquals(len(msg), 62)
         self.assertEquals(msg, '[新着動画]ニコニコ動画 - ああああああああああ [13/01/01 00:00] | ' + url)
 
         title = 'あ' * 10
         url = 'http://' + 'u' * 140
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
-                                       self.str_post_datetime,
-                                       title=title, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
+                                   self.str_post_datetime,
+                                   title=title, url=url)
         self.assertEquals(len(msg), 192)
         self.assertEquals(msg, '[新着動画]ニコニコ動画 - ああああああああああ [13/01/01 00:00] | ' + url)
 
         title = 'あ' * 140
         url = 'http://' + 'u' * 10
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
-                                       self.str_post_datetime,
-                                       title=title, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_VIDEO_TWEET_FORMAT,
+                                   self.str_post_datetime,
+                                   title=title, url=url)
         self.assertEquals(len(msg), 140)
         self.assertEquals(msg, '[新着動画]ニコニコ動画 - ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ [13/01/01 00:00] | ' + url)
 
     def test_make_tweet_msg2(self):
         title = 'あ' * 140
         url = 'http://' + 'u' * 20
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
-                                       self.str_post_datetime,
-                                       1000, 2000, 3000, title=title, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
+                                   self.str_post_datetime,
+                                   1000, 2000, 3000, title=title, url=url)
         self.assertEquals(len(msg), 147)
         self.assertEquals(msg, 'あああああああああああああああああああああああああああああああああああああああああああああああああああああああああ [投稿日:13/01/01 00:00, 再生:1000, コメ:2000, マイリス:3000] | ' + url + ' #niconico')
 
@@ -320,36 +326,36 @@ class TwitterBotBaseTest(unittest.TestCase):
         title = 'あ' * 10
         comment = 'ア' * 10
         url = 'http://' + 'u' * 10
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
-                                       self.str_post_datetime,
-                                       title=title, comment=comment, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                   self.str_post_datetime,
+                                   title=title, comment=comment, url=url)
         self.assertEquals(len(msg), 72)
         self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああ ' + url)
 
         title = 'あ' * 10
         comment = 'ア' * 10
         url = 'http://' + 'u' * 100
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
-                                       self.str_post_datetime,
-                                       title=title, comment=comment, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                   self.str_post_datetime,
+                                   title=title, comment=comment, url=url)
         self.assertEquals(len(msg), 162)
         self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああ ' + url)
 
         title = 'あ' * 140
         comment = 'ア' * 10
         url = 'http://' + 'u' * 20
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
-                                       self.str_post_datetime,
-                                       title=title, comment=comment, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                   self.str_post_datetime,
+                                   title=title, comment=comment, url=url)
         self.assertEquals(len(msg), 147)
         self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ ' + url)
 
         title = 'あ' * 140
         comment = 'ア' * 100
         url = 'http://' + 'u' * 20
-        msg = self.bot._make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
-                                       self.str_post_datetime,
-                                       title=title, comment=comment, url=url)
+        msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
+                                   self.str_post_datetime,
+                                   title=title, comment=comment, url=url)
         self.assertEquals(len(msg), 146)
         self.assertEquals(msg, '[コメント]アアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああああああああああああああああああああああああああああああああああ ' + url)
 
