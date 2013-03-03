@@ -7,7 +7,7 @@ import datetime
 import time
 
 TW_MAX_TWEET_LENGTH = 140
-TW_URL_LENGTH = 20
+TW_URL_LENGTH = 22
 
 
 def utc_str2local_datetime(utc_str, src_format='%a %b %d %H:%M:%S +0000 %Y'):
