@@ -4,6 +4,7 @@
 from apiclient.discovery import build
 import datetime
 import logging
+import re
 
 import utils
 
@@ -72,6 +73,8 @@ class YoutubeSearch(object):
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
         logger.debug('Call search_videos({}, {})'.format(keyword, from_datetime))
 
+        re_keyword = re.compile(keyword, re.I)
+
         video_dict = {}
         for i in range(1, 3):
             youtube = build(YoutubeSearch.API_SERVICE_NAME,
@@ -94,6 +97,9 @@ class YoutubeSearch(object):
                 logger.debug('youtube_video={}'.format(youtube_video))
 
                 if youtube_video.published_at < from_datetime:
+                    continue
+                if not re_keyword.search(youtube_video.title):
+                    logger.info('Skip: {}'.format(youtube_video))
                     continue
                 if not youtube_video.video_id in video_dict:
                     video_dict[youtube_video.video_id] = youtube_video

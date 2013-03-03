@@ -206,7 +206,7 @@ class TwitterVideoBotTest(unittest.TestCase):
             bot.create_database()
 
         self.prev_datetime = datetime.datetime.now()
-        self.prev_datetime = self.prev_datetime - datetime.timedelta(1)
+        self.prev_datetime = self.prev_datetime - datetime.timedelta(7)
 
     def test_nico_video_post(self):
         prev_datetime = datetime.datetime.strptime('2013-01-25 00:00:00', '%Y-%m-%d %H:%M:%S')
@@ -319,8 +319,8 @@ class UtilTest(unittest.TestCase):
         msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_DETAIL_VIDEO_TWEET_FORMAT,
                                    self.str_post_datetime,
                                    1000, 2000, 3000, title=title, url=url)
-        self.assertEquals(len(msg), 147)
-        self.assertEquals(msg, 'あああああああああああああああああああああああああああああああああああああああああああああああああああああああああ [投稿日:13/01/01 00:00, 再生:1000, コメ:2000, マイリス:3000] | ' + url + ' #niconico')
+        self.assertEquals(len(msg), 145)
+        self.assertEquals(msg, 'あああああああああああああああああああああああああああああああああああああああああああああああああああああああ [投稿日:13/01/01 00:00, 再生:1000, コメ:2000, マイリス:3000] | ' + url + ' #niconico')
 
     def test_make_tweet_msg3(self):
         title = 'あ' * 10
@@ -347,8 +347,8 @@ class UtilTest(unittest.TestCase):
         msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
                                    self.str_post_datetime,
                                    title=title, comment=comment, url=url)
-        self.assertEquals(len(msg), 147)
-        self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ ' + url)
+        self.assertEquals(len(msg), 145)
+        self.assertEquals(msg, '[コメント]アアアアアアアアアア (00:00) [13/01/01 00:00] | あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ ' + url)
 
         title = 'あ' * 140
         comment = 'ア' * 100
@@ -356,8 +356,8 @@ class UtilTest(unittest.TestCase):
         msg = utils.make_tweet_msg(TwitterVideoBot.TW_NICO_COMMENT_TWEET_FORMAT, '00:00',
                                    self.str_post_datetime,
                                    title=title, comment=comment, url=url)
-        self.assertEquals(len(msg), 146)
-        self.assertEquals(msg, '[コメント]アアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアア (00:00) [13/01/01 00:00] | ああああああああああああああああああああああああああああああああああああああああああ ' + url)
+        self.assertEquals(len(msg), 144)
+        self.assertEquals(msg, '[コメント]アアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアアア (00:00) [13/01/01 00:00] | あああああああああああああああああああああああああああああああああああああああああ ' + url)
 
 
 if __name__ == '__main__':
