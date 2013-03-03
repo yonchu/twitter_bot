@@ -73,7 +73,8 @@ class YoutubeSearch(object):
         from_datetime = from_datetime or datetime.datetime.fromtimestamp(0)
         logger.debug('Call search_videos({}, {})'.format(keyword, from_datetime))
 
-        re_keyword = re.compile(keyword, re.I)
+        re_keyword = '|'.join([x.strip() for x in keyword.split('OR')])
+        re_keyword = re.compile(re_keyword, re.I)
 
         video_dict = {}
         for i in range(1, 3):
@@ -92,14 +93,17 @@ class YoutubeSearch(object):
 
             for video in search_response.get('items', []):
                 if not YoutubeVideo.is_video(video):
+                    logger.debug('Skip(not video): {}'.format(video))
                     continue
                 youtube_video = YoutubeVideo.fromResponse(video)
                 logger.debug('youtube_video={}'.format(youtube_video))
 
                 if youtube_video.published_at < from_datetime:
+                    logger.info('Skip(tiem over): {}'.format(youtube_video))
                     continue
-                if not re_keyword.search(youtube_video.title):
-                    logger.info('Skip: {}'.format(youtube_video))
+                if not (re_keyword.search(youtube_video.title)
+                        or re_keyword.search(youtube_video.description)):
+                    logger.info('Skip(not incules keyword): {}'.format(youtube_video))
                     continue
                 if not youtube_video.video_id in video_dict:
                     video_dict[youtube_video.video_id] = youtube_video

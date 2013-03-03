@@ -246,7 +246,7 @@ class TwitterVideoBotTest(unittest.TestCase):
     def test_youtube_video_post(self):
         bot = TwitterVideoBot(BOT_CONFIG)
         bot.is_test = True
-        bot.youtube_video_post('mbaacc', self.prev_datetime)
+        bot.youtube_video_post('mbaacc OR mbaa', None)
 
 
 from tweepy.error import TweepError
